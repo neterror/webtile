@@ -1,0 +1,15 @@
+<div [ngClass]="state.htmlClass" [ngStyle]="state.htmlStyle" class="tool-panel" draggable="true">
+    <material-toggle *ngIf="canDisable" #draw [label]="toolboxLabel" [(ngModel)]="enabled" (checkedChange)="onEnabled"></material-toggle>
+    <div *ngIf="dataLabel != null">
+        <material-input [label]="dataLabel" [(ngModel)]="dataText"> </material-input>
+    </div>
+
+    <material-radio-group [(ngModel)]="selected" (selectedChange)="onToolChange" class="column">
+        <div *ngFor="let option of options; let i = index">
+            <material-radio [disabled]="!enabled" [value]="option">
+                {{option.label}}
+            </material-radio>
+        </div>
+    </material-radio-group>
+
+</div>

@@ -1,0 +1,24 @@
+<div [ngClass]="state.htmlClass" [ngStyle]="state.htmlStyle" class="tool-panel column" draggable="true">
+    <div class="row fence-commands">
+        <material-input (focus)="onMapSelector(false)" label="channel"> </material-input>
+        <material-auto-suggest-input (focus)="onMapSelector(false)" label="command" [selectionOptions]="commands">
+
+        </material-auto-suggest-input>
+        <material-auto-suggest-input (focus)="onMapSelector(false)" label="group" [selectionOptions]="groups">
+
+        </material-auto-suggest-input>
+        <material-auto-suggest-input (focus)="onMapSelector(false)" label="detect" [selectionOptions]="detection">
+
+        </material-auto-suggest-input>
+    </div>
+
+    <div class="row fence-object">
+        <material-input (focus)="onMapSelector(true)" [label]="'point or geojson'" [(ngModel)]="fenceObject"></material-input>
+    </div>
+
+    <toolbox id="draw" [optionBloc]="sketchBloc" [canDisable]="false" [state]="drawToolboxBloc | bloc"
+        [toolboxLabel]="'Geofence Object'" [options]="drawOptions">
+    </toolbox>
+
+    {{shapesBloc | bloc}}
+</div>

@@ -1,0 +1,55 @@
+<div id="fleet-editor">
+    <material-list groups="groups">
+        <material-list-item [disabled]="true">Groups</material-list-item>
+        <material-select-item *ngFor="let f of fleet; let i = index" (trigger)="onSelectedGroup(i)" [selected]="selectedGroup == i">
+            <material-button icon (trigger)="removeGroup(i)">
+                <material-icon *ngIf="selectedGroup == i" icon="delete"> </material-icon>
+            </material-button>
+            {{f.name}}
+        </material-select-item>
+
+        <material-fab raised mini (trigger)="onAddGroup()">
+            <material-icon icon="add"></material-icon>
+        </material-fab>
+    </material-list>
+
+
+    <material-list id="vehicles" *ngIf="fleet.isNotEmpty">
+        <material-list-item [disabled]="true">Vehicles in {{fleet[selectedGroup].name}}</material-list-item>
+        <material-list-item *ngFor="let v of fleet[selectedGroup].vehicles; let i = index"
+            (trigger)="onSelectedVehicle(i)">
+            <material-button icon (trigger)="removeVehicle(i)">
+                <material-icon *ngIf="selectedVehicle == i" icon="delete"> </material-icon>
+            </material-button>
+            {{v}}
+        </material-list-item>
+
+
+        <material-fab raised mini (trigger)="onAddVehicle()">
+            <material-icon icon="add"></material-icon>
+        </material-fab>
+    </material-list>
+</div>
+
+
+<modal *ngIf="newGroupDlg" [visible]="true">
+    <material-dialog info>
+        <material-input autoFocus [label]="'group'" [(ngModel)]="newItem"></material-input>
+        <material-yes-no-buttons [yesText]="'OK'" [noText]="'Cancel'" (yes)="onGroupDlgFinish(true)"
+            (no)="onGroupDlgFinish(false)">
+        </material-yes-no-buttons>
+    </material-dialog>
+</modal>
+
+
+<modal *ngIf="newVehicleDlg" [visible]="true">
+    <material-dialog info headered>
+        <div header class="title">
+            New vehicle in {{fleet[selectedGroup].name}}
+        </div>
+        <material-input autoFocus [label]="'vehicle'" [(ngModel)]="newItem"></material-input>
+        <material-yes-no-buttons [yesText]="'OK'" [noText]="'Cancel'" (yes)="onVehicleDlgFinish(true)"
+            (no)="onVehicleDlgFinish(false)">
+        </material-yes-no-buttons>
+    </material-dialog>
+</modal>

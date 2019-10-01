@@ -1,0 +1,9 @@
+#map-editor {
+    position: relative;
+    border: 1px solid lightgray;
+}
+
+open-street-map {
+    width: 500px;
+    height: 500px;
+}

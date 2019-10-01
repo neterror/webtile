@@ -1,0 +1,11 @@
+<div>
+    <div class="row">
+        <material-input autoFocus label="CLI command" [(ngModel)]="command" (change)="onSend"></material-input>
+    </div>
+
+    <div *ngIf="isResponded" class="response">
+        <pre>
+        {{response}}
+        </pre>
+    </div>
+</div>

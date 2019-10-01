@@ -1,0 +1,8 @@
+<material-tab-strip [tabLabels]="tabLabels" (activeTabIndexChange)="onTabChange">
+</material-tab-strip>
+
+<div [ngSwitch]="activeTab" id="main">
+    <map-editor *ngSwitchCase="0"> </map-editor>
+    <fleet-editor *ngSwitchCase="1"> </fleet-editor>
+    <tile38-cli *ngSwitchCase="2" [bloc]="cliBloc " [state]="cliBloc | bloc "> </tile38-cli>
+</div>

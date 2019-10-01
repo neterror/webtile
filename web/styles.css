@@ -1,0 +1,21 @@
+@import url(https://fonts.googleapis.com/css?family=Roboto);
+@import url(https://fonts.googleapis.com/css?family=Material+Icons);
+body {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 5vw;
+}
+
+* {
+    font-family: Roboto, Helvetica, Arial, sans-serif;
+}
+
+.geofence-labels {
+    font-size: 12px;
+}
+
+.leaflet-tooltip.geofence-labels {
+    background: transparent;
+    box-shadow: none;
+    border: none;
+}

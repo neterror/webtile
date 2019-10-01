@@ -1,0 +1,14 @@
+<div id="map-editor">
+    <open-street-map enableDraw [state]="sketchBloc | bloc" [size]="{'width': '100%', 'height': '400px'}">
+    </open-street-map>
+
+    <toolbox id="draw" [optionBloc]="sketchBloc" [state]="drawToolboxBloc | bloc" [dataLabel]="'Area object'"
+        [toolboxLabel]="'Draw Toolbox'" [options]="drawOptions">
+    </toolbox>
+
+    <fence-toolbox id="fence" [state]="fenceToolboxBloc | bloc" [map]="map"> </fence-toolbox>
+
+    <material-toggle raised (checkedChange)="onShowDraw" [label]="'Sketch Tool'"> </material-toggle>
+    <material-toggle raised (checkedChange)="onFenceEditor" [label]="'GeoFence editor'"> </material-toggle>
+
+</div>

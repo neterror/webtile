@@ -1,0 +1,35 @@
+#fleet-editor {
+    display: flex;
+    flex-direction: row;
+}
+
+#fleet-editor material-list {
+    position: relative;
+    width: 50%;
+    border: 1px solid lightgray;
+    border-radius: 5px;
+    margin: 5px;
+}
+
+#fleet-editor material-fab {
+    position: absolute;
+    right: 10px;
+    bottom: 10px;
+}
+
+#fleet-editor material-list-item:nth-child(1) {
+    font-size: 1.2em;
+}
+
+material-list-item material-icon {
+    margin-right: 10px;
+}
+
+.column {
+    display: flex;
+    flex-direction: column;
+}
+
+material-dialog .title {
+    color: white;
+}

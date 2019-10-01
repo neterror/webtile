@@ -1,0 +1,16 @@
+.row {
+    display: flex;
+    justify-content: center;
+}
+
+.row material-input {
+    width: 500px;
+}
+
+.response {
+    border: 1px solid lightgray;
+    border-radius: 10px;
+    height: 500px;
+    overflow: scroll;
+    font-size: 0.9em;
+}
