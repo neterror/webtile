@@ -36,34 +36,27 @@ import 'package:webtile38/src/map_component/open_street_map.dart';
     ])
 class FenceToolboxComponent with Dragging {
   final drawToolboxBloc = ToolboxBloc(); //toolbox appearance
-  final shapesBloc = AreaBloc(); //final shapes processor
-
-  @Input()
-  set map(OpenStreetMap value) {
-    sketchBloc?.map = value;
-    shapesBloc.state.listen((AreaState s) {
-      if (s is AreaCreatedState) {
-        fenceObject = s.shape.description;
-        s.shape.dispose();
-        sketchBloc.dispatch(EndOptionEvent());
-      }
-    });
-  }
+  final areasBloc = AreaBloc(); //final shapes processor
 
   @Input()
   ToolboxState state;
 
-  SketchBloc sketchBloc; //dawing shapes processor
+  SketchBloc drawingBloc; //dawing shapes processor
 
   String fenceObject = "";
 
   final List<String> groups;
-  FenceToolboxComponent(DataStore store)
-      : groups = store.fleet.map((x) => x.name).toList() {
-    sketchBloc = SketchBloc(shapesBloc);
 
-    initDragging(container: "#map-editor");
-    makeDraggable("#draw", drawToolboxBloc);
+  @Input()
+  set map(OpenStreetMap value) {
+    drawingBloc?.map = value;
+    areasBloc.state.listen((AreaState s) {
+      if (s is AreaCreatedState) {
+        fenceObject = s.shape.description;
+        s.shape.dispose();
+        drawingBloc.dispatch(EndOptionEvent());
+      }
+    });
   }
 
   final drawOptions = <OptionsEvent>[
@@ -86,6 +79,14 @@ class FenceToolboxComponent with Dragging {
     "outside",
     "cross"
   ];
+
+  FenceToolboxComponent(DataStore store)
+      : groups = store.fleet.map((x) => x.name).toList() {
+    drawingBloc = SketchBloc(areasBloc);
+
+    initDragging(container: "#map-editor");
+    makeDraggable("#draw", drawToolboxBloc);
+  }
 
   void onMapSelector(bool visible) {
     sketchToolbox.enabled = visible;

@@ -17,13 +17,11 @@
         <material-input (focus)="onMapSelector(true)" [label]="'point or geojson'" [(ngModel)]="fenceObject"></material-input>
     </div>
 
-    <toolbox id="draw" [optionBloc]="sketchBloc" [canDisable]="false" [state]="drawToolboxBloc | bloc"
+    <toolbox id="draw" [optionBloc]="drawingBloc" [canDisable]="false" [state]="drawToolboxBloc | bloc"
         [toolboxLabel]="'Geofence Object'" [options]="drawOptions">
     </toolbox>
 
     <material-button raised [disabled]="fenceObject.isEmpty">
         Create channel
     </material-button>
-
-    {{shapesBloc | bloc}}
 </div>
