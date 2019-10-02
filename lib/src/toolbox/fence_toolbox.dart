@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:angular_bloc/angular_bloc.dart';
 import 'package:bloc/bloc.dart';
 import 'package:angular/angular.dart';
@@ -7,6 +9,7 @@ import 'package:webtile38/src/toolbox/toolbox.dart';
 import 'package:webtile38/src/toolbox/dragging.dart';
 import 'package:webtile38/src/providers/datastore.dart';
 import 'package:webtile38/src/map_component/open_street_map.dart';
+import 'fence_cmd_model.dart';
 
 @Component(
     selector: 'fence-toolbox',
@@ -34,15 +37,19 @@ import 'package:webtile38/src/map_component/open_street_map.dart';
     styleUrls: [
       'toolbox.css'
     ])
-class FenceToolboxComponent with Dragging {
+class FenceToolboxComponent with Dragging implements OnDestroy {
+  final fenceCmd = FenceCmdModel();
   final drawToolboxBloc = ToolboxBloc(); //toolbox appearance
   final areasBloc = AreaBloc(); //final shapes processor
 
+  static const allCommands = FenceCmdModel.allowedCmd;  //to make them visible in the html
+  static const allDetections = FenceCmdModel.allowedDetection;
+
+  StreamSubscription _subscription;
+
   @Input()
   ToolboxState state;
-
   SketchBloc drawingBloc; //dawing shapes processor
-
   String fenceObject = "";
 
   final List<String> groups;
@@ -50,7 +57,7 @@ class FenceToolboxComponent with Dragging {
   @Input()
   set map(OpenStreetMap value) {
     drawingBloc?.map = value;
-    areasBloc.state.listen((AreaState s) {
+    _subscription = areasBloc.state.listen((AreaState s) {
       if (s is AreaCreatedState) {
         fenceObject = s.shape.description;
         s.shape.dispose();
@@ -70,15 +77,6 @@ class FenceToolboxComponent with Dragging {
   @Input()
   Bloc optionBloc; //notify the bloc with selection events
 
-  final commands = <String>["nearby", "within", "intersects"];
-  final detection = <String>[
-    "all",
-    "enter",
-    "exit",
-    "inside",
-    "outside",
-    "cross"
-  ];
 
   FenceToolboxComponent(DataStore store)
       : groups = store.fleet.map((x) => x.name).toList() {
@@ -88,9 +86,19 @@ class FenceToolboxComponent with Dragging {
     makeDraggable("#draw", drawToolboxBloc);
   }
 
+  @override
+  void ngOnDestroy() {
+    drawingBloc.dispose();
+    areasBloc.dispose();
+    _subscription?.cancel();
+  }
   void onMapSelector(bool visible) {
     sketchToolbox.enabled = visible;
     drawToolboxBloc
         .dispatch(visible ? ShowToolEvent([460, 0]) : HideToolEvent());
+  }
+  
+  void onCreateChannel() {
+    print("created command: $fenceCmd");
   }
 }

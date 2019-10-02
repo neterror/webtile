@@ -1,27 +1,30 @@
 <div [ngClass]="state.htmlClass" [ngStyle]="state.htmlStyle" class="tool-panel column" draggable="true">
     <div class="tool-header"></div>
     <div class="row fence-commands">
-        <material-input (focus)="onMapSelector(false)" label="channel"> </material-input>
-        <material-auto-suggest-input (focus)="onMapSelector(false)" label="command" [selectionOptions]="commands">
-
+        <material-input required (focus)="onMapSelector(false)" label="channel" [(ngModel)]="fenceCmd.channel"> </material-input>
+        <material-auto-suggest-input required (focus)="onMapSelector(false)" label="command"
+            [selectionOptions]="allCommands" [slide]="'x'" [(ngModel)]="fenceCmd.command">
         </material-auto-suggest-input>
-        <material-auto-suggest-input (focus)="onMapSelector(false)" label="group" [selectionOptions]="groups">
 
+        <material-auto-suggest-input required (focus)="onMapSelector(false)" [slide]="'x'" label="group" [selectionOptions]="groups"
+            [(ngModel)]="fenceCmd.group">
         </material-auto-suggest-input>
-        <material-auto-suggest-input (focus)="onMapSelector(false)" label="detect" [selectionOptions]="detection">
 
+        <material-auto-suggest-input required (focus)="onMapSelector(false)" label="detect" [slide]="'x'"
+            [selectionOptions]="allDetections" [(ngModel)]="fenceCmd.detection">
         </material-auto-suggest-input>
     </div>
 
     <div class="row fence-object">
-        <material-input (focus)="onMapSelector(true)" [label]="'point or geojson'" [(ngModel)]="fenceObject"></material-input>
+        <material-input (focus)="onMapSelector(true)" [label]="'select area on map or enter geojson'"
+            [(ngModel)]="fenceObject"></material-input>
     </div>
 
     <toolbox id="draw" [optionBloc]="drawingBloc" [canDisable]="false" [state]="drawToolboxBloc | bloc"
         [toolboxLabel]="'Geofence Object'" [options]="drawOptions">
     </toolbox>
 
-    <material-button raised [disabled]="fenceObject.isEmpty">
+    <material-button raised [disabled]="fenceObject.isEmpty" (click)="onCreateChannel">
         Create channel
     </material-button>
 </div>

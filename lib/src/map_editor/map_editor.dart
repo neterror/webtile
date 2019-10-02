@@ -17,7 +17,7 @@ import 'package:webtile38/src/toolbox/bloc/bloc.dart';
   DrawDirective,
   FenceToolboxComponent
 ])
-class MapEditorComponent with Dragging implements AfterViewInit {
+class MapEditorComponent with Dragging implements AfterViewInit, OnDestroy {
   @ViewChild(OpenStreetMap)
   OpenStreetMap map;
 
@@ -28,6 +28,11 @@ class MapEditorComponent with Dragging implements AfterViewInit {
     initDragging(container: "#map-editor");
     makeDraggable("#fence", fenceToolboxBloc);
     fenceToolboxBloc.dispatch(ShowToolEvent([100, 400]));
+  }
+
+  @override
+  void ngOnDestroy() {
+    fenceToolboxBloc.dispose();
   }
 }
 
