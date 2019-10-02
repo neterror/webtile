@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:angular_bloc/angular_bloc.dart';
 import 'package:bloc/bloc.dart';
 import 'package:angular/angular.dart';
@@ -38,19 +37,23 @@ import 'fence_cmd_model.dart';
       'toolbox.css'
     ])
 class FenceToolboxComponent with Dragging implements OnDestroy {
-  final fenceCmd = FenceCmdModel();
+  final _streamCtrl = StreamController<FenceCmdModel>();
+  FenceCmdModel fenceCmd = FenceCmdModel();
   final drawToolboxBloc = ToolboxBloc(); //toolbox appearance
   final areasBloc = AreaBloc(); //final shapes processor
 
-  static const allCommands = FenceCmdModel.allowedCmd;  //to make them visible in the html
+  static const allCommands =
+      FenceCmdModel.allowedCmd; //to make them visible in the html
   static const allDetections = FenceCmdModel.allowedDetection;
 
   StreamSubscription _subscription;
 
+  @Output()
+  Stream<FenceCmdModel> get created => _streamCtrl.stream;
+
   @Input()
   ToolboxState state;
   SketchBloc drawingBloc; //dawing shapes processor
-  String fenceObject = "";
 
   final List<String> groups;
 
@@ -59,7 +62,8 @@ class FenceToolboxComponent with Dragging implements OnDestroy {
     drawingBloc?.map = value;
     _subscription = areasBloc.state.listen((AreaState s) {
       if (s is AreaCreatedState) {
-        fenceObject = s.shape.description;
+        fenceCmd.area = s.shape.description;
+        //todo - take the shape to visualize it as activated
         s.shape.dispose();
         drawingBloc.dispatch(EndOptionEvent());
       }
@@ -77,7 +81,6 @@ class FenceToolboxComponent with Dragging implements OnDestroy {
   @Input()
   Bloc optionBloc; //notify the bloc with selection events
 
-
   FenceToolboxComponent(DataStore store)
       : groups = store.fleet.map((x) => x.name).toList() {
     drawingBloc = SketchBloc(areasBloc);
@@ -92,13 +95,15 @@ class FenceToolboxComponent with Dragging implements OnDestroy {
     areasBloc.dispose();
     _subscription?.cancel();
   }
+
   void onMapSelector(bool visible) {
     sketchToolbox.enabled = visible;
     drawToolboxBloc
         .dispatch(visible ? ShowToolEvent([460, 0]) : HideToolEvent());
   }
-  
+
   void onCreateChannel() {
-    print("created command: $fenceCmd");
+    _streamCtrl.sink.add(fenceCmd);
+    fenceCmd = FenceCmdModel();
   }
 }

@@ -13,4 +13,5 @@ class FenceCmdModel {
   String command; //nearby, intercect or within
   String group;  //user defined name
   String detection; //enter, leave
+  String area;
 }
