@@ -8,6 +8,4 @@ import 'package:webtile38/src/toolbox/bloc/bloc.dart';
 class DrawDirective {
   @Input()
   DrawingState state;
-
-  DrawDirective();
 }
