@@ -45,6 +45,7 @@ class AppComponent implements OnInit, OnDestroy {
 
   @override
   void ngOnInit() {
+    _protocol.connect();
     cliBloc = Tile38cliBloc(protocol: _protocol);
   }
 

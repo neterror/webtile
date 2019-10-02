@@ -31,7 +31,7 @@ class HttpProto implements Tile38Proto {
   }
 
   @override
-  bool send(dynamic msg) {
+  void send(dynamic msg) {
     String cmd = msg;
     cmd.replaceAll(" ", "+");
     print("execute command: $cmd");
@@ -42,6 +42,5 @@ class HttpProto implements Tile38Proto {
     var s1 = _socket.onMessage.listen(_onReceive);
     var s2 = _socket.onClose.listen(_onClosed);
     _subscriptions.addAll([s0, s1, s2]);
-    return false;
   }
 }

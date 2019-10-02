@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:angular/angular.dart';
 import 'package:angular_bloc/angular_bloc.dart';
 import 'package:webtile38/src/map_component/open_street_map.dart';
@@ -9,8 +8,8 @@ import 'package:webtile38/src/toolbox/toolbox.dart';
 import 'package:webtile38/src/toolbox/fence_toolbox.dart';
 import 'package:webtile38/src/sketch_maker/draw_directive.dart';
 import 'package:webtile38/src/toolbox/bloc/bloc.dart';
-import 'package:webtile38/src/cli_console/bloc/bloc.dart';
 import 'package:webtile38/src/providers/tile38_proto.dart';
+import 'package:webtile38/src/gen/tile38.pb.dart';
 
 @Component(selector: 'map-editor', templateUrl: 'map_editor.html', styleUrls: [
   'map_editor.css'
@@ -26,9 +25,7 @@ class MapEditorComponent with Dragging implements AfterViewInit, OnDestroy {
   @ViewChild(OpenStreetMap)
   OpenStreetMap map;
   Tile38Proto _protocol;
-  final _subscriptions = <StreamSubscription> [];
   final fenceToolboxBloc = ToolboxBloc(); //toolbox appearance
-  final _channels = <Tile38cliBloc>[];
 
   MapEditorComponent(this._protocol);
 
@@ -44,20 +41,30 @@ class MapEditorComponent with Dragging implements AfterViewInit, OnDestroy {
     fenceToolboxBloc.dispose();
   }
 
+  final _cmd = <String, Command>{
+    "nearby": Command.nearby,
+    "intersects": Command.intersects,
+    "within": Command.within
+  };
+
+  final _detection = <String, Detection>{
+    "enter": Detection.enter,
+    "leave": Detection.leave,
+    "inside": Detection.inside,
+    "outside": Detection.outside,
+    "cross": Detection.cross,
+    "all": Detection.all
+  };
+
   void onChannelCreated(FenceCmdModel fence) {
-    var detection = "";
-    if (fence.detection != "all") {
-      detection = " DETECT ${fence.detection}";
-    }
-    var cmd =
-        "SETCHAN ${fence.channel} ${fence.command} ${fence.group} FENCE${detection} ${fence.area}";
+    final packet = Packet();
+    packet.createFence = CreateFence();
+    packet.createFence.command = _cmd[fence.command];
+    packet.createFence.area = fence.area;
+    packet.createFence.group = fence.group;
+    packet.createFence.detection = _detection[fence.detection];
 
-    var channel = Tile38cliBloc(protocol: _protocol);
-    var sub = channel.state.listen(print);
-
-    _channels.add(channel);
-    _subscriptions.add(sub);
-    channel.dispatch(Tile38CmdEvent(cmd));
+    _protocol.send(packet);
   }
 }
 
