@@ -2,7 +2,6 @@ import 'package:angular_bloc/angular_bloc.dart';
 import 'package:bloc/bloc.dart';
 import 'package:angular/angular.dart';
 import 'package:angular_components/angular_components.dart';
-import 'package:webtile38/src/sketch_maker/circle_shape.dart';
 import 'package:webtile38/src/toolbox/bloc/bloc.dart';
 import 'package:webtile38/src/toolbox/toolbox.dart';
 import 'package:webtile38/src/toolbox/dragging.dart';
@@ -26,6 +25,7 @@ import 'package:webtile38/src/map_component/open_street_map.dart';
       MaterialAutoSuggestInputComponent,
       MaterialRadioComponent,
       MaterialRadioGroupComponent,
+      MaterialButtonComponent,
       ToolboxComponent
     ],
     pipes: [

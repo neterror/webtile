@@ -1,4 +1,5 @@
 <div [ngClass]="state.htmlClass" [ngStyle]="state.htmlStyle" class="tool-panel column" draggable="true">
+    <div class="tool-header"></div>
     <div class="row fence-commands">
         <material-input (focus)="onMapSelector(false)" label="channel"> </material-input>
         <material-auto-suggest-input (focus)="onMapSelector(false)" label="command" [selectionOptions]="commands">
@@ -19,6 +20,10 @@
     <toolbox id="draw" [optionBloc]="sketchBloc" [canDisable]="false" [state]="drawToolboxBloc | bloc"
         [toolboxLabel]="'Geofence Object'" [options]="drawOptions">
     </toolbox>
+
+    <material-button raised [disabled]="fenceObject.isEmpty">
+        Create channel
+    </material-button>
 
     {{shapesBloc | bloc}}
 </div>
