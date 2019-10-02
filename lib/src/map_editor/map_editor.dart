@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'package:angular/angular.dart';
 import 'package:angular_bloc/angular_bloc.dart';
 import 'package:webtile38/src/map_component/open_street_map.dart';

@@ -57,6 +57,58 @@ class CreateFence extends $pb.GeneratedMessage {
   void clearArea() => clearField(4);
 }
 
+class GenericCommand extends $pb.GeneratedMessage {
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo('GenericCommand')
+    ..aOS(1, 'command')
+    ..hasRequiredFields = false
+  ;
+
+  GenericCommand._() : super();
+  factory GenericCommand() => create();
+  factory GenericCommand.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory GenericCommand.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  GenericCommand clone() => GenericCommand()..mergeFromMessage(this);
+  GenericCommand copyWith(void Function(GenericCommand) updates) => super.copyWith((message) => updates(message as GenericCommand));
+  $pb.BuilderInfo get info_ => _i;
+  @$core.pragma('dart2js:noInline')
+  static GenericCommand create() => GenericCommand._();
+  GenericCommand createEmptyInstance() => create();
+  static $pb.PbList<GenericCommand> createRepeated() => $pb.PbList<GenericCommand>();
+  static GenericCommand getDefault() => _defaultInstance ??= create()..freeze();
+  static GenericCommand _defaultInstance;
+
+  $core.String get command => $_getS(0, '');
+  set command($core.String v) { $_setString(0, v); }
+  $core.bool hasCommand() => $_has(0);
+  void clearCommand() => clearField(1);
+}
+
+class GenericResponse extends $pb.GeneratedMessage {
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo('GenericResponse')
+    ..aOS(1, 'response')
+    ..hasRequiredFields = false
+  ;
+
+  GenericResponse._() : super();
+  factory GenericResponse() => create();
+  factory GenericResponse.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory GenericResponse.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  GenericResponse clone() => GenericResponse()..mergeFromMessage(this);
+  GenericResponse copyWith(void Function(GenericResponse) updates) => super.copyWith((message) => updates(message as GenericResponse));
+  $pb.BuilderInfo get info_ => _i;
+  @$core.pragma('dart2js:noInline')
+  static GenericResponse create() => GenericResponse._();
+  GenericResponse createEmptyInstance() => create();
+  static $pb.PbList<GenericResponse> createRepeated() => $pb.PbList<GenericResponse>();
+  static GenericResponse getDefault() => _defaultInstance ??= create()..freeze();
+  static GenericResponse _defaultInstance;
+
+  $core.String get response => $_getS(0, '');
+  set response($core.String v) { $_setString(0, v); }
+  $core.bool hasResponse() => $_has(0);
+  void clearResponse() => clearField(1);
+}
+
 class GeofenceEvent extends $pb.GeneratedMessage {
   static final $pb.BuilderInfo _i = $pb.BuilderInfo('GeofenceEvent')
     ..e<Detection>(1, 'detection', $pb.PbFieldType.OE, Detection.enter, Detection.valueOf, Detection.values)
@@ -109,17 +161,23 @@ class GeofenceEvent extends $pb.GeneratedMessage {
 
 enum Packet_Data {
   createFence, 
+  genericCmd, 
+  genericResponse, 
   notSet
 }
 
 class Packet extends $pb.GeneratedMessage {
   static const $core.Map<$core.int, Packet_Data> _Packet_DataByTag = {
     1 : Packet_Data.createFence,
+    2 : Packet_Data.genericCmd,
+    3 : Packet_Data.genericResponse,
     0 : Packet_Data.notSet
   };
   static final $pb.BuilderInfo _i = $pb.BuilderInfo('Packet')
-    ..oo(0, [1])
+    ..oo(0, [1, 2, 3])
     ..a<CreateFence>(1, 'createFence', $pb.PbFieldType.OM, CreateFence.getDefault, CreateFence.create)
+    ..a<GenericCommand>(2, 'genericCmd', $pb.PbFieldType.OM, GenericCommand.getDefault, GenericCommand.create)
+    ..a<GenericResponse>(3, 'genericResponse', $pb.PbFieldType.OM, GenericResponse.getDefault, GenericResponse.create)
     ..hasRequiredFields = false
   ;
 
@@ -144,5 +202,15 @@ class Packet extends $pb.GeneratedMessage {
   set createFence(CreateFence v) { setField(1, v); }
   $core.bool hasCreateFence() => $_has(0);
   void clearCreateFence() => clearField(1);
+
+  GenericCommand get genericCmd => $_getN(1);
+  set genericCmd(GenericCommand v) { setField(2, v); }
+  $core.bool hasGenericCmd() => $_has(1);
+  void clearGenericCmd() => clearField(2);
+
+  GenericResponse get genericResponse => $_getN(2);
+  set genericResponse(GenericResponse v) { setField(3, v); }
+  $core.bool hasGenericResponse() => $_has(2);
+  void clearGenericResponse() => clearField(3);
 }
 

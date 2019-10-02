@@ -44,5 +44,13 @@ class ProtobufProxy implements Tile38Proto {
     _receivedCtrl.sink.add(packet);
   }
 
-  void send(dynamic data) =>  _socket.send((data as Packet).writeToBuffer());
+  void send(dynamic data) {
+    if (data is Packet) {
+      _socket.send(data.writeToBuffer());
+    } else if (data is String) {
+      var packet = Packet()..genericCmd = GenericCommand();
+      packet.genericCmd.command = data;
+      _socket.send(packet.writeToBuffer());
+    }
+  }
 }
