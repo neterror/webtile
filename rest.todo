@@ -1,0 +1,9 @@
+hooks editor:
+    hook name is split as <group>_<number>
+    ☐ list hooks available for a given group
+    ☐ create, delete hooks. For creation use the map editor
+    ☐ upon selection, visualize the hook areas
+
+
+    
+

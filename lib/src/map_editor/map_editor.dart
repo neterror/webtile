@@ -11,6 +11,7 @@ import 'package:webtile38/src/sketch_maker/draw_directive.dart';
 import 'package:webtile38/src/toolbox/bloc/bloc.dart';
 import 'package:webtile38/src/providers/tile38_proto.dart';
 import 'package:webtile38/src/gen/tile38.pb.dart';
+import 'package:webtile38/src/geofence_list/geofence_list_component.dart';
 
 @Component(selector: 'map-editor', templateUrl: 'map_editor.html', styleUrls: [
   'map_editor.css'
@@ -20,7 +21,8 @@ import 'package:webtile38/src/gen/tile38.pb.dart';
   OpenStreetMap,
   ToolboxComponent,
   DrawDirective,
-  FenceToolboxComponent
+  FenceToolboxComponent,
+  GeofenceListComponent
 ])
 class MapEditorComponent with Dragging implements AfterViewInit, OnDestroy {
   @ViewChild(OpenStreetMap)
