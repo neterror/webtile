@@ -44,7 +44,16 @@ class ProtobufProxy implements Tile38Proto {
     _receivedCtrl.sink.add(packet);
   }
 
-  void send(dynamic data) {
+  void send(dynamic data) async {
+    bool connected = _socket.readyState != WebSocket.OPEN;
+    if (!connected) {
+      connected =  await connect();
+    }
+    if (!connected) {
+      print("send abandoned. not connected with the server");
+      return;
+    }
+
     if (data is Packet) {
       _socket.send(data.writeToBuffer());
     } else if (data is String) {

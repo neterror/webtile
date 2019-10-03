@@ -8,5 +8,6 @@ abstract class Tile38Proto {
 }
 
 Tile38Proto protocolFactory() {
+  //return HttpProto();
   return ProtobufProxy();
 }

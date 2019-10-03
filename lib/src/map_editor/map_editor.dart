@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:angular/angular.dart';
 import 'package:angular_bloc/angular_bloc.dart';
 import 'package:webtile38/src/map_component/open_street_map.dart';
@@ -24,6 +26,7 @@ class MapEditorComponent with Dragging implements AfterViewInit, OnDestroy {
   @ViewChild(OpenStreetMap)
   OpenStreetMap map;
   Tile38Proto _protocol;
+  StreamSubscription _sub;
   final fenceToolboxBloc = ToolboxBloc(); //toolbox appearance
 
   MapEditorComponent(this._protocol);
@@ -33,11 +36,14 @@ class MapEditorComponent with Dragging implements AfterViewInit, OnDestroy {
     initDragging(container: "#map-editor");
     makeDraggable("#fence", fenceToolboxBloc);
     fenceToolboxBloc.dispatch(ShowToolEvent([100, 400]));
+
+    _sub = _protocol.received.listen(_onReceived);
   }
 
   @override
   void ngOnDestroy() {
     fenceToolboxBloc.dispose();
+    _sub?.cancel();
   }
 
   final _cmd = <String, Command>{
@@ -64,6 +70,22 @@ class MapEditorComponent with Dragging implements AfterViewInit, OnDestroy {
     packet.createFence.detection = _detection[fence.detection];
 
     _protocol.send(packet);
+  }
+
+  void _onReceived(dynamic data) {
+    if (data is! Packet) return;
+
+    var packet = data as Packet;
+    switch (packet.whichData()) {
+      case Packet_Data.geofenceEvent:
+        _geofenceEvent(packet.geofenceEvent);
+        break;
+      default:
+    }
+  }
+
+  void _geofenceEvent(GeofenceEvent event) {
+    print("received geofence event: ${event}");
   }
 }
 
