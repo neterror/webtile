@@ -23,6 +23,7 @@ class SketchBloc extends Bloc<OptionsEvent, DrawingState> {
   ) async* {
     _draw?.active = false;
     _draw = null;
+    map.style["cursor"] = "pointer";
 
     DrawingState result = InactiveDrawingState();
 
@@ -37,6 +38,7 @@ class SketchBloc extends Bloc<OptionsEvent, DrawingState> {
     if (_draw is Draw) {
       _draw.active = true;
       result = ActiveDrawingState(_draw);
+      map.style["cursor"] = "crosshair";
     }
     yield result;
   }

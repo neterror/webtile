@@ -9,7 +9,6 @@ class FenceCmdModel {
     "cross"
   ];
 
-  String channel; //user defined name
   String command; //nearby, intercect or within
   String group;  //user defined name
   String detection; //enter, leave

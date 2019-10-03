@@ -115,7 +115,7 @@ class GeofenceEvent extends $pb.GeneratedMessage {
     ..aOS(2, 'hook')
     ..aOS(3, 'group')
     ..aOS(4, 'vehicle')
-    ..aOS(5, 'area')
+    ..a<LatLng>(5, 'position', $pb.PbFieldType.OM, LatLng.getDefault, LatLng.create)
     ..hasRequiredFields = false
   ;
 
@@ -153,10 +153,42 @@ class GeofenceEvent extends $pb.GeneratedMessage {
   $core.bool hasVehicle() => $_has(3);
   void clearVehicle() => clearField(4);
 
-  $core.String get area => $_getS(4, '');
-  set area($core.String v) { $_setString(4, v); }
-  $core.bool hasArea() => $_has(4);
-  void clearArea() => clearField(5);
+  LatLng get position => $_getN(4);
+  set position(LatLng v) { setField(5, v); }
+  $core.bool hasPosition() => $_has(4);
+  void clearPosition() => clearField(5);
+}
+
+class LatLng extends $pb.GeneratedMessage {
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo('LatLng')
+    ..a<$core.double>(1, 'lat', $pb.PbFieldType.OD)
+    ..a<$core.double>(2, 'lng', $pb.PbFieldType.OD)
+    ..hasRequiredFields = false
+  ;
+
+  LatLng._() : super();
+  factory LatLng() => create();
+  factory LatLng.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory LatLng.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  LatLng clone() => LatLng()..mergeFromMessage(this);
+  LatLng copyWith(void Function(LatLng) updates) => super.copyWith((message) => updates(message as LatLng));
+  $pb.BuilderInfo get info_ => _i;
+  @$core.pragma('dart2js:noInline')
+  static LatLng create() => LatLng._();
+  LatLng createEmptyInstance() => create();
+  static $pb.PbList<LatLng> createRepeated() => $pb.PbList<LatLng>();
+  static LatLng getDefault() => _defaultInstance ??= create()..freeze();
+  static LatLng _defaultInstance;
+
+  $core.double get lat => $_getN(0);
+  set lat($core.double v) { $_setDouble(0, v); }
+  $core.bool hasLat() => $_has(0);
+  void clearLat() => clearField(1);
+
+  $core.double get lng => $_getN(1);
+  set lng($core.double v) { $_setDouble(1, v); }
+  $core.bool hasLng() => $_has(1);
+  void clearLng() => clearField(2);
 }
 
 enum Packet_Data {

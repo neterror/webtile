@@ -1,3 +1,4 @@
+import 'package:webtile38/src/providers/http_proto.dart';
 import 'package:webtile38/src/providers/protobuf_proxy.dart';
 
 abstract class Tile38Proto {

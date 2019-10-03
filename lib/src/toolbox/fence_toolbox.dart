@@ -99,7 +99,7 @@ class FenceToolboxComponent with Dragging implements OnDestroy {
   void onMapSelector(bool visible) {
     sketchToolbox.enabled = visible;
     drawToolboxBloc
-        .dispatch(visible ? ShowToolEvent([460, 0]) : HideToolEvent());
+        .dispatch(visible ? ShowToolEvent([320, 0]) : HideToolEvent());
   }
 
   void onCreateChannel() {

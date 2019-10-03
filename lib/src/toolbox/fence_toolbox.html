@@ -1,7 +1,6 @@
 <div [ngClass]="state.htmlClass" [ngStyle]="state.htmlStyle" class="tool-panel column" draggable="true">
     <div class="tool-header"></div>
     <div class="row fence-commands">
-        <material-input (focus)="onMapSelector(false)" label="channel" [(ngModel)]="fenceCmd.channel"> </material-input>
         <material-auto-suggest-input (focus)="onMapSelector(false)" label="command" [selectionOptions]="allCommands"
             [slide]="'x'" [(ngModel)]="fenceCmd.command">
         </material-auto-suggest-input>

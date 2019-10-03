@@ -20,7 +20,7 @@ class OpenStreetMap implements OnInit, AfterViewInit {
   }
 
   @Input()
-  Map<String, String> size;
+  Map<String, String> style;
 
   void _show(String elementId) {
     _map = LeafletMap("map-placeholder");
