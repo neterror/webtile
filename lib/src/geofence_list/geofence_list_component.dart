@@ -67,8 +67,18 @@ class GeofenceListComponent with Dragging implements OnInit, OnDestroy {
   void _onReceived(dynamic data) {
     if (data is! Packet) return;
     Packet packet = data;
-    if (packet.whichData() == Packet_Data.hooks) {
-      hooks = packet.hooks.items;
+    switch (packet.whichData()) {
+      case Packet_Data.hooks:
+        hooks = packet.hooks.items;
+        break;
+      case Packet_Data.status:
+        if (!packet.status.success) {
+          print("error: ${packet.status.message}");
+        } else {
+          print("operation complete");
+        }
+        break;
+      default:
     }
   }
 
