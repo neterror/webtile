@@ -60,7 +60,7 @@ class DrawCircle implements Draw {
   }
 
   void _drawCircleEnd(m.LeafletMouseEvent e) {
-    var shape = CircleShape(_map, _bloc, _label, _circleMarker, _centerCoord);
+    var shape = CircleShape(_map, _label, _circleMarker, _centerCoord, _bloc);
     _bloc.dispatch(AreaCreatedEvent(shape));
     _centerCoord = null;
     _centerPoint = null;

@@ -7,7 +7,7 @@ class PolygonShape extends Shape {
   final LeafletMap _map;
   final Polyline _polyline;
   CircleMarker _marker;
-  PolygonShape(this._map, AreaBloc bloc, String label, this._polyline) : super(_polyline, bloc) {
+  PolygonShape(this._map, String label, this._polyline, [AreaBloc bloc]) : super(_polyline, bloc) {
     _createLabel(label);
   }
 

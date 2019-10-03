@@ -19,7 +19,7 @@ class Shape {
     }
   }
 
-  Shape(this._path, this._areaBloc);
+  Shape(this._path, [this._areaBloc]);
 
   removeFromMap() => _path.remove();
 

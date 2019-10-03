@@ -1,4 +1,9 @@
 <div>
+    <material-list>
+        <material-list-item *ngFor="let hook of hooks" (trigger)="selected(hook)">
+            {{hook.hookName}} {{hook.command}} {{hook.group}}
+        </material-list-item>
 
+    </material-list>
     <material-button raised (click)="getHookList">Retrieve List</material-button>
 </div>

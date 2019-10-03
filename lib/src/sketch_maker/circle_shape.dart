@@ -8,7 +8,7 @@ class CircleShape extends Shape {
   LatLng _center;
   final Circle _circle;
 
-  CircleShape(this._map, AreaBloc areaBloc, label, this._circle, this._center)
+  CircleShape(this._map, label, this._circle, this._center, [AreaBloc areaBloc])
       : super(_circle, areaBloc) {
     _createLabel(label);
   }
