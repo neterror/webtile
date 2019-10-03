@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:angular_bloc/angular_bloc.dart';
-import 'package:bloc/bloc.dart';
 import 'package:angular/angular.dart';
 import 'package:angular_components/angular_components.dart';
 import 'package:webtile38/src/toolbox/bloc/bloc.dart';
@@ -8,7 +7,7 @@ import 'package:webtile38/src/toolbox/toolbox.dart';
 import 'package:webtile38/src/toolbox/dragging.dart';
 import 'package:webtile38/src/providers/datastore.dart';
 import 'package:webtile38/src/map_component/open_street_map.dart';
-import 'fence_cmd_model.dart';
+import 'package:webtile38/src/gen/tile38.pb.dart';
 
 @Component(
     selector: 'fence-toolbox',
@@ -37,35 +36,53 @@ import 'fence_cmd_model.dart';
       'toolbox.css'
     ])
 class FenceToolboxComponent with Dragging implements OnDestroy {
-  final _streamCtrl = StreamController<FenceCmdModel>();
-  FenceCmdModel fenceCmd = FenceCmdModel();
+  final _streamCtrl = StreamController<CreateHook>();
+  final hook = Hook();
   final drawToolboxBloc = ToolboxBloc(); //toolbox appearance
   final areasBloc = AreaBloc(); //final shapes processor
 
-  static const allCommands =
-      FenceCmdModel.allowedCmd; //to make them visible in the html
-  static const allDetections = FenceCmdModel.allowedDetection;
+  final allCommands = Command.values.map((c) => c.name).toList();
+  final allDetections = Detection.values.map((c) => c.name).toList();
 
   StreamSubscription _subscription;
 
+  String areaText;
+
   @Output()
-  Stream<FenceCmdModel> get created => _streamCtrl.stream;
+  Stream<CreateHook> get created => _streamCtrl.stream;
 
   @Input()
   ToolboxState state;
+
   SketchBloc drawingBloc; //dawing shapes processor
 
   final List<String> groups;
+
+  Area _makeArea(String text) {
+    var area = Area();
+    if (!text.startsWith("POINT")) {
+      area.json = GeoJson()..value = text;
+    } else {
+      final tokens = text.split(" ");
+      area.point = Point()..center = LatLng();
+      area.point.center.lat = double.parse(tokens[1]);
+      area.point.center.lng = double.parse(tokens[2]);
+      area.point.radius = double.parse(tokens[3]);
+    }
+    return area;
+  }
 
   @Input()
   set map(OpenStreetMap value) {
     drawingBloc?.map = value;
     _subscription = areasBloc.state.listen((AreaState s) {
       if (s is AreaCreatedState) {
-        fenceCmd.area = s.shape.description;
-        //todo - take the shape to visualize it as activated
+        areaText = s.shape.description;
+        hook.area = _makeArea(s.shape.description);
         s.shape.dispose();
         drawingBloc.dispatch(EndOptionEvent());
+      } else if (s is AreaDrawInProgress) {
+        areaText = s.message;
       }
     });
   }
@@ -77,9 +94,6 @@ class FenceToolboxComponent with Dragging implements OnDestroy {
 
   @ViewChild(ToolboxComponent)
   ToolboxComponent sketchToolbox;
-
-  @Input()
-  Bloc optionBloc; //notify the bloc with selection events
 
   FenceToolboxComponent(DataStore store)
       : groups = store.fleet.map((x) => x.name).toList() {
@@ -102,8 +116,22 @@ class FenceToolboxComponent with Dragging implements OnDestroy {
         .dispatch(visible ? ShowToolEvent([320, 0]) : HideToolEvent());
   }
 
+  void onSelectedCommand(String cmd) =>
+      hook.command = Command.values.firstWhere((c) =>
+          c.name ==
+          cmd); //search in the list of strings the Enum value of command
+
+  void onSelectedDetection(String detect) =>
+      hook.detection = Detection.values.firstWhere(
+          (c) => c.name == detect); //search in the list of available strings
+
   void onCreateChannel() {
-    _streamCtrl.sink.add(fenceCmd);
-    fenceCmd = FenceCmdModel();
+    var create = CreateHook();
+    create.hook = hook;
+    _streamCtrl.sink.add(create);
+  }
+
+  void onCancel() {
+    _streamCtrl.sink.add(null);
   }
 }

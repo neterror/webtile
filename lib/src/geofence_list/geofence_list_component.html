@@ -1,9 +1,16 @@
 <div>
     <material-list>
         <material-list-item *ngFor="let hook of hooks" (trigger)="selected(hook)">
-            {{hook.hookName}} {{hook.command}} {{hook.group}}
+            {{hook.name}} {{hook.command}} {{hook.group}}
         </material-list-item>
 
     </material-list>
     <material-button raised (click)="getHookList">Retrieve List</material-button>
+
+    <material-fab (click)="addNewHook" mini raised>
+        <material-icon icon="add"></material-icon>
+    </material-fab>
+    
+    <fence-toolbox id="fence" [state]="fenceToolboxBloc | bloc" [map]="map" (created)="onHookCreated"> </fence-toolbox>
+
 </div>

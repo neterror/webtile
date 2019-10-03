@@ -2,9 +2,13 @@ import 'dart:convert';
 import 'dart:async';
 import 'package:angular/angular.dart';
 import 'package:angular_components/angular_components.dart';
+import 'package:angular_bloc/angular_bloc.dart';
+import 'package:webtile38/src/toolbox/dragging.dart';
 import 'package:webtile38/src/gen/tile38.pb.dart';
 import 'package:webtile38/src/map_component/open_street_map.dart';
 import 'package:webtile38/src/providers/tile38_proto.dart';
+import 'package:webtile38/src/toolbox/fence_toolbox.dart';
+import 'package:webtile38/src/toolbox/bloc/bloc.dart';
 import 'package:dartleaf/dartleaf.dart' as ll;
 
 @Component(
@@ -13,13 +17,19 @@ import 'package:dartleaf/dartleaf.dart' as ll;
     styleUrls: [
       'geofence_list_component.css'
     ],
+    pipes: [
+      BlocPipe
+    ],
     directives: [
       coreDirectives,
       MaterialListComponent,
       MaterialListItemComponent,
-      MaterialButtonComponent
+      MaterialButtonComponent,
+      FenceToolboxComponent,
+      MaterialFabComponent,
+      MaterialIconComponent
     ])
-class GeofenceListComponent implements OnInit, OnDestroy {
+class GeofenceListComponent with Dragging implements OnInit, OnDestroy {
   Tile38Proto _protocol;
   GeofenceListComponent(this._protocol);
   StreamSubscription _sub;
@@ -29,15 +39,29 @@ class GeofenceListComponent implements OnInit, OnDestroy {
   @Input()
   OpenStreetMap map;
 
+  final fenceToolboxBloc = ToolboxBloc(); //toolbox appearance
+
+  void onHookCreated(CreateHook hook) {
+    fenceToolboxBloc.dispatch(HideToolEvent());
+    if (hook is CreateHook) {
+      print("created hook: ${hook.hook}");
+      final packet = Packet()..createHook = hook;
+      _protocol.send(packet);
+    }
+  }
+
   @override
   void ngOnInit() {
     _sub = _protocol.received.listen(_onReceived);
+    initDragging(container: "#map-editor");
+    makeDraggable("#fence", fenceToolboxBloc);
   }
 
   @override
   void ngOnDestroy() {
     _sub.cancel();
     _selected?.remove();
+    fenceToolboxBloc.dispose();
   }
 
   void _onReceived(dynamic data) {
@@ -76,5 +100,9 @@ class GeofenceListComponent implements OnInit, OnDestroy {
         ? _circle(hook.area)
         : _polygon(hook.area);
     _selected.addTo(map.map);
+  }
+
+  void addNewHook() {
+    fenceToolboxBloc.dispatch(ShowToolEvent([100, 100]));
   }
 }

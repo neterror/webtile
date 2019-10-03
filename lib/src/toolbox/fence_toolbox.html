@@ -2,28 +2,34 @@
     <div class="tool-header"></div>
     <div class="row fence-commands">
         <material-auto-suggest-input (focus)="onMapSelector(false)" label="command" [selectionOptions]="allCommands"
-            [slide]="'x'" [(ngModel)]="fenceCmd.command">
+            [slide]="'x'" (selectionChange)="onSelectedCommand">
         </material-auto-suggest-input>
 
         <material-auto-suggest-input (focus)="onMapSelector(false)" [slide]="'x'" label="group"
-            [selectionOptions]="groups" [(ngModel)]="fenceCmd.group">
+            [selectionOptions]="groups" [(ngModel)]="hook.group">
         </material-auto-suggest-input>
 
         <material-auto-suggest-input (focus)="onMapSelector(false)" label="detect" [slide]="'x'"
-            [selectionOptions]="allDetections" [(ngModel)]="fenceCmd.detection">
+            [selectionOptions]="allDetections"  (selectionChange)="onSelectedDetection">
         </material-auto-suggest-input>
     </div>
 
     <div class="row fence-object">
         <material-input (focus)="onMapSelector(true)" [label]="'select area on map or enter geojson'"
-            [(ngModel)]="fenceCmd.area"></material-input>
+            [(ngModel)]="areaText"></material-input>
     </div>
 
     <toolbox id="draw" [optionBloc]="drawingBloc" [canDisable]="false" [state]="drawToolboxBloc | bloc"
         [toolboxLabel]="'Geofence Object'" [options]="drawOptions">
     </toolbox>
 
-    <material-button raised [disabled]="(fenceCmd.area == null) || fenceCmd.area.isEmpty" (click)="onCreateChannel">
-        Create GeoFence
-    </material-button>
+    <div class="row">
+        <material-button raised [disabled]="hook.area == null" (click)="onCreateChannel">
+            Create
+        </material-button>
+        <material-button raised (click)="onCancel">
+            Cancel
+        </material-button>
+    </div>
+
 </div>
