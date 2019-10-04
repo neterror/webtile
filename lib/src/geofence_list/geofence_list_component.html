@@ -1,22 +1,32 @@
 <div class="hook-list">
     <div class="row">
         <div class="column">
-            <material-auto-suggest-input [leadingGlyph]="'search'" [label]="'group filter'" [selectionOptions]="groups"
+            <material-auto-suggest-input [leadingGlyph]="'search'" [label]="'group filter'" [selectionOptions]="groups" [(inputText)]="enteredFilter"
                 (selectionChange)="getHookList">
             </material-auto-suggest-input>
 
-            <material-button (click)="addNewHook" raised>
-                New Hook
-            </material-button>
+            <div class="row">
+                <material-button (click)="addNewHook" raised> New </material-button>
+                <material-button (click)="delHook" raised [disabled]="selectedIdx == null"> Remove </material-button>
+            </div>
         </div>
 
         <material-list>
             <material-select-item *ngFor="let hook of hooks; let i = index" (trigger)="selected(hook, i)"
                 [selected]="i == selectedIdx">
-                {{hook.name}} {{hook.command}} {{hook.group}}
+                {{hook.command}} {{hook.group}} FENCE {{hook.area}}
             </material-select-item>
         </material-list>
     </div>
+
+
+    <modal *ngIf="lastStatus.show" [visible]="true">
+        <material-dialog info [autoDismissable]="true" (dismiss)="onStatusDismissed">
+            <h2> Server Response </h2>
+            <p *ngIf="lastStatus.success"> Operation Successful</p>
+            <p *ngIf="!lastStatus.success"> Error: {{lastStatus.message}} </p>
+        </material-dialog>
+    </modal>
 
     <fence-toolbox id="fence" [state]="fenceToolboxBloc | bloc" [map]="map" (created)="onHookCreated"> </fence-toolbox>
 

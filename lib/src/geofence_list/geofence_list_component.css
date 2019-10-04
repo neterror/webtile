@@ -10,7 +10,17 @@
     flex-direction: row;
 }
 
+material-dialog {
+    width: 300px;
+    color: white;
+}
+material-dialog material-button {
+    margin: 30px;
+}
+
+
 .column {
     display: flex;
     flex-direction: column;
+    align-content: space-between;
 }

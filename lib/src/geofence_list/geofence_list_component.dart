@@ -11,6 +11,13 @@ import 'package:webtile38/src/providers/tile38_proto.dart';
 import 'package:webtile38/src/toolbox/fence_toolbox.dart';
 import 'package:webtile38/src/toolbox/bloc/bloc.dart';
 import 'package:dartleaf/dartleaf.dart' as ll;
+import 'package:angular_components/laminate/components/modal/modal.dart';
+
+class _LastStatus {
+  bool show;
+  bool success;
+  String message;
+}
 
 @Component(
     selector: 'geofence-list',
@@ -26,6 +33,7 @@ import 'package:dartleaf/dartleaf.dart' as ll;
     ],
     directives: [
       coreDirectives,
+      NgModel,
       MaterialAutoSuggestInputComponent,
       MaterialListComponent,
       MaterialListItemComponent,
@@ -33,20 +41,24 @@ import 'package:dartleaf/dartleaf.dart' as ll;
       MaterialButtonComponent,
       FenceToolboxComponent,
       MaterialFabComponent,
-      MaterialIconComponent
+      MaterialIconComponent,
+      MaterialDialogComponent,
+      AutoDismissDirective,
+      ModalComponent
     ])
 class GeofenceListComponent with Dragging implements OnInit, OnDestroy {
   Tile38Proto _protocol;
   final List<String> groups;
+  String enteredFilter;
 
+  final lastStatus = _LastStatus();
   GeofenceListComponent(this._protocol, DataStore store)
       : groups = store.fleet.map((x) => x.name).toList();
 
-
   StreamSubscription _sub;
   List<Hook> hooks;
-  int selectedIdx;
-  ll.Path _selected;
+  int selectedIdx = -1;
+  ll.Path _selectedPath;
 
   @Input()
   OpenStreetMap map;
@@ -71,7 +83,7 @@ class GeofenceListComponent with Dragging implements OnInit, OnDestroy {
   @override
   void ngOnDestroy() {
     _sub.cancel();
-    _selected?.remove();
+    _selectedPath?.remove();
     fenceToolboxBloc.dispose();
   }
 
@@ -79,15 +91,13 @@ class GeofenceListComponent with Dragging implements OnInit, OnDestroy {
     if (data is! Packet) return;
     Packet packet = data;
     switch (packet.whichData()) {
-      case Packet_Data.hooks:
-        hooks = packet.hooks.items;
+      case Packet_Data.hookList:
+        hooks = packet.hookList.items;
         break;
       case Packet_Data.status:
-        if (!packet.status.success) {
-          print("error: ${packet.status.message}");
-        } else {
-          print("operation complete");
-        }
+        lastStatus.success = packet.status.success;
+        lastStatus.message = packet.status.message;
+        lastStatus.show = true;
         break;
       default:
     }
@@ -118,8 +128,8 @@ class GeofenceListComponent with Dragging implements OnInit, OnDestroy {
 
   void selected(Hook hook, int index) {
     selectedIdx = index;
-    _selected?.remove();
-    _selected = (hook.area.whichData() == Area_Data.point)
+    _selectedPath?.remove();
+    _selectedPath = (hook.area.whichData() == Area_Data.point)
         ? _circle(hook.area)
         : _polygon(hook.area);
   }
@@ -128,15 +138,34 @@ class GeofenceListComponent with Dragging implements OnInit, OnDestroy {
     fenceToolboxBloc.dispatch(ShowToolEvent([100, 100]));
   }
 
+  void delHook() {
+    if (selectedIdx == -1) return;
+    final request = DelHook();
+    request.pattern = hooks[selectedIdx].name;
+    print("Deleting hook $request.pattern");
+    final packet = Packet()..delHook = request;
+    _protocol.send(packet);
+  }
+
   void getHookList(String filter) {
+    selectedIdx = -1;
+    _selectedPath?.remove();
+    
     if (filter is! String) {
       filter = "";
-    };
+    }
 
     final request = GetHooks();
-    request.pattern = filter;
+    request.pattern = "${filter}*"; //append wildcard at the end
     print("sending tho hook pattern: $filter");
     final packet = Packet()..getHooks = request;
     _protocol.send(packet);
+  }
+
+  void onStatusDismissed() {
+    lastStatus.show = false;
+    if (lastStatus.success) {
+      getHookList(enteredFilter);
+    }
   }
 }

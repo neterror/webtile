@@ -125,7 +125,9 @@ class FenceToolboxComponent with Dragging implements OnDestroy {
 
   void onSelectedDetection(String detect) {
     //search in the list of available strings
-    hook.detection = Detection.values.firstWhere((c) => c.name == detect);
+    if (detect is String) {
+      hook.detection = Detection.values.firstWhere((c) => c.name == detect);
+    }
   }
 
   void onCreateChannel() {
