@@ -1,8 +1,8 @@
 <div class="hook-list">
     <div class="row">
         <div class="column">
-            <material-auto-suggest-input [leadingGlyph]="'search'" [label]="'group filter'" [selectionOptions]="groups" [(inputText)]="enteredFilter"
-                (selectionChange)="getHookList">
+            <material-auto-suggest-input [leadingGlyph]="'search'" [label]="'group filter'" [selectionOptions]="groups"
+                [(inputText)]="enteredFilter" (selectionChange)="getHookList">
             </material-auto-suggest-input>
 
             <div class="row">
@@ -21,10 +21,10 @@
 
 
     <modal *ngIf="lastStatus.show" [visible]="true">
-        <material-dialog info [autoDismissable]="true" (dismiss)="onStatusDismissed">
-            <h2> Server Response </h2>
+        <material-dialog [autoDismissable]="true" (dismiss)="onStatusDismissed">
             <p *ngIf="lastStatus.success"> Operation Successful</p>
             <p *ngIf="!lastStatus.success"> Error: {{lastStatus.message}} </p>
+            <material-button raised (click)="onStatusDismissed"> OK </material-button>
         </material-dialog>
     </modal>
 

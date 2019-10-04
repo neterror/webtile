@@ -61,7 +61,7 @@ class FenceToolboxComponent with Dragging implements OnDestroy {
   Area _makeArea(String text) {
     var area = Area();
     if (!text.startsWith("POINT")) {
-      area.json = GeoJson()..value = text;
+      area.json = GeoJson()..value = text;// text.replaceFirst("LineString", "Polygon");
     } else {
       final tokens = text.split(" ");
       area.point = Point()..center = LatLng();

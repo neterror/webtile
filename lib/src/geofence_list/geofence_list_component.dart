@@ -119,7 +119,14 @@ class GeofenceListComponent with Dragging implements OnInit, OnDestroy {
   ll.Path _polygon(Area area) {
     final json = jsonDecode(area.json.value);
     var coordinates = [];
-    for (var pos in json["geometry"]["coordinates"]) {
+    var list = json["geometry"]["coordinates"];
+    if (list.isEmpty) {
+      print("empty polygon coordinates");
+      return null;
+    }
+    if (list[0][0] is List) list = list[0]; //LineSegment is list of pairs, Polyline is list of list of pairs ... !@#
+
+    for (var pos in list) {
       var latlng = ll.LatLng(pos[1], pos[0]);
       coordinates.add(latlng);
     }
