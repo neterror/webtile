@@ -67,6 +67,7 @@ class GeofenceListComponent with Dragging implements OnInit, OnDestroy {
 
   void onHookCreated(CreateHook hook) {
     fenceToolboxBloc.dispatch(HideToolEvent());
+    _selectedPath?.remove();
     if (hook is CreateHook) {
       final packet = Packet()..createHook = hook;
       _protocol.send(packet);
@@ -93,6 +94,9 @@ class GeofenceListComponent with Dragging implements OnInit, OnDestroy {
     switch (packet.whichData()) {
       case Packet_Data.hookList:
         hooks = packet.hookList.items;
+        break;
+      case Packet_Data.geofenceEvent:
+        print("geofence event: ${packet.geofenceEvent}");
         break;
       case Packet_Data.status:
         lastStatus.success = packet.status.success;
@@ -150,10 +154,8 @@ class GeofenceListComponent with Dragging implements OnInit, OnDestroy {
   void getHookList(String filter) {
     selectedIdx = -1;
     _selectedPath?.remove();
-    
-    if (filter is! String) {
-      filter = "";
-    }
+
+    if (filter is! String) filter = "";
 
     final request = GetHooks();
     request.pattern = "${filter}*"; //append wildcard at the end
