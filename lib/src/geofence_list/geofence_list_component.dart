@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:angular/angular.dart';
 import 'package:angular_components/angular_components.dart';
 import 'package:angular_bloc/angular_bloc.dart';
+import 'package:webtile38/src/providers/datastore.dart';
 import 'package:webtile38/src/toolbox/dragging.dart';
 import 'package:webtile38/src/gen/tile38.pb.dart';
 import 'package:webtile38/src/map_component/open_street_map.dart';
@@ -20,10 +21,15 @@ import 'package:dartleaf/dartleaf.dart' as ll;
     pipes: [
       BlocPipe
     ],
+    providers: [
+      materialProviders
+    ],
     directives: [
       coreDirectives,
+      MaterialAutoSuggestInputComponent,
       MaterialListComponent,
       MaterialListItemComponent,
+      MaterialSelectItemComponent,
       MaterialButtonComponent,
       FenceToolboxComponent,
       MaterialFabComponent,
@@ -31,9 +37,15 @@ import 'package:dartleaf/dartleaf.dart' as ll;
     ])
 class GeofenceListComponent with Dragging implements OnInit, OnDestroy {
   Tile38Proto _protocol;
-  GeofenceListComponent(this._protocol);
+  final List<String> groups;
+
+  GeofenceListComponent(this._protocol, DataStore store)
+      : groups = store.fleet.map((x) => x.name).toList();
+
+
   StreamSubscription _sub;
   List<Hook> hooks;
+  int selectedIdx;
   ll.Path _selected;
 
   @Input()
@@ -44,7 +56,6 @@ class GeofenceListComponent with Dragging implements OnInit, OnDestroy {
   void onHookCreated(CreateHook hook) {
     fenceToolboxBloc.dispatch(HideToolEvent());
     if (hook is CreateHook) {
-      print("created hook: ${hook.hook}");
       final packet = Packet()..createHook = hook;
       _protocol.send(packet);
     }
@@ -82,37 +93,50 @@ class GeofenceListComponent with Dragging implements OnInit, OnDestroy {
     }
   }
 
-  void getHookList() {
-    final request = GetHooks();
-    request.pattern = "*";
-    final packet = Packet()..getHooks = request;
-    _protocol.send(packet);
-  }
-
   ll.Path _circle(Area area) {
     final p = area.point;
     var center = ll.LatLng(p.center.lat, p.center.lng);
-    return ll.Circle(center, ll.CircleOptions(radius: p.radius));
+    var result = ll.Circle(center, ll.CircleOptions(radius: p.radius));
+    map.map.setView(center, 14);
+    result.addTo(map.map);
+    return result;
   }
 
   ll.Path _polygon(Area area) {
     final json = jsonDecode(area.json.value);
     var coordinates = [];
     for (var pos in json["geometry"]["coordinates"]) {
-      coordinates.add(ll.LatLng(pos[1], pos[0]));
+      var latlng = ll.LatLng(pos[1], pos[0]);
+      coordinates.add(latlng);
     }
-    return ll.Polygon(coordinates);
+    ll.Polygon result = ll.Polygon(coordinates);
+    result.addTo(map.map);
+    var center = result.getCenter();
+    map.map.setView(center, 14);
+    return result;
   }
 
-  void selected(Hook hook) {
+  void selected(Hook hook, int index) {
+    selectedIdx = index;
     _selected?.remove();
     _selected = (hook.area.whichData() == Area_Data.point)
         ? _circle(hook.area)
         : _polygon(hook.area);
-    _selected.addTo(map.map);
   }
 
   void addNewHook() {
     fenceToolboxBloc.dispatch(ShowToolEvent([100, 100]));
+  }
+
+  void getHookList(String filter) {
+    if (filter is! String) {
+      filter = "";
+    };
+
+    final request = GetHooks();
+    request.pattern = filter;
+    print("sending tho hook pattern: $filter");
+    final packet = Packet()..getHooks = request;
+    _protocol.send(packet);
   }
 }

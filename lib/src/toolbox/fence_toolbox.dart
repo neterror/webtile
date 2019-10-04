@@ -116,14 +116,17 @@ class FenceToolboxComponent with Dragging implements OnDestroy {
         .dispatch(visible ? ShowToolEvent([320, 0]) : HideToolEvent());
   }
 
-  void onSelectedCommand(String cmd) =>
-      hook.command = Command.values.firstWhere((c) =>
-          c.name ==
-          cmd); //search in the list of strings the Enum value of command
+  void onSelectedCommand(String cmd) {
+    if (cmd is String) {
+      //search in the list of strings the Enum value of command
+      hook.command = Command.values.firstWhere((c) => c.name == cmd);
+    }
+  }
 
-  void onSelectedDetection(String detect) =>
-      hook.detection = Detection.values.firstWhere(
-          (c) => c.name == detect); //search in the list of available strings
+  void onSelectedDetection(String detect) {
+    //search in the list of available strings
+    hook.detection = Detection.values.firstWhere((c) => c.name == detect);
+  }
 
   void onCreateChannel() {
     var create = CreateHook();
