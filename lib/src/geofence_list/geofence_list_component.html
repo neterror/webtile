@@ -1,19 +1,24 @@
 <div class="hook-list">
     <div class="row">
         <div class="column">
-            <material-auto-suggest-input [leadingGlyph]="'search'" [label]="'group filter'" [selectionOptions]="groups"
-                [(inputText)]="enteredFilter" (selectionChange)="getHookList">
-            </material-auto-suggest-input>
+
+            <material-list class="group-list">
+                <material-select-item *ngFor="let group of groups; let i = index " (trigger)="onSelectGroup(group, i)"
+                    [selected]="i == selectedGroupIdx">
+                    {{group}}
+                </material-select-item>
+
+            </material-list>
 
             <div class="row">
                 <material-button (click)="addNewHook" raised> New </material-button>
-                <material-button (click)="delHook" raised [disabled]="selectedIdx == null"> Remove </material-button>
+                <material-button (click)="delHook" raised [disabled]="selectedHookIdx == null"> Remove </material-button>
             </div>
         </div>
 
         <material-list>
-            <material-select-item *ngFor="let hook of hooks; let i = index" (trigger)="selected(hook, i)"
-                [selected]="i == selectedIdx">
+            <material-select-item *ngFor="let hook of hooks; let i = index" (trigger)="onSelectedHook(hook, i)"
+                [selected]="i == selectedHookIdx">
                 {{hook.command}} {{hook.group}} FENCE {{hook.area}}
             </material-select-item>
         </material-list>

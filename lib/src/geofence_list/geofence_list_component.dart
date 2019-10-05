@@ -50,6 +50,8 @@ class GeofenceListComponent with Dragging implements OnInit, OnDestroy {
   Tile38Proto _protocol;
   final List<String> groups;
   String enteredFilter;
+  String selectedGroup;
+  int selectedGroupIdx;
 
   final lastStatus = _LastStatus();
   GeofenceListComponent(this._protocol, DataStore store)
@@ -57,7 +59,7 @@ class GeofenceListComponent with Dragging implements OnInit, OnDestroy {
 
   StreamSubscription _sub;
   List<Hook> hooks;
-  int selectedIdx = -1;
+  int selectedHookIdx = -1;
   ll.Path _selectedPath;
 
   @Input()
@@ -96,7 +98,6 @@ class GeofenceListComponent with Dragging implements OnInit, OnDestroy {
         hooks = packet.hookList.items;
         break;
       case Packet_Data.geofenceEvent:
-        print("geofence event: ${packet.geofenceEvent}");
         break;
       case Packet_Data.status:
         lastStatus.success = packet.status.success;
@@ -124,7 +125,10 @@ class GeofenceListComponent with Dragging implements OnInit, OnDestroy {
       print("empty polygon coordinates");
       return null;
     }
-    if (list[0][0] is List) list = list[0]; //LineSegment is list of pairs, Polyline is list of list of pairs ... !@#
+    if (list[0][0] is List) {
+      //LineSegment is list of pairs, Polyline is list of list of pairs ... !@#
+      list = list[0];
+    }
 
     for (var pos in list) {
       var latlng = ll.LatLng(pos[1], pos[0]);
@@ -137,12 +141,18 @@ class GeofenceListComponent with Dragging implements OnInit, OnDestroy {
     return result;
   }
 
-  void selected(Hook hook, int index) {
-    selectedIdx = index;
+  void onSelectedHook(Hook hook, int index) {
+    selectedHookIdx = index;
     _selectedPath?.remove();
     _selectedPath = (hook.area.whichData() == Area_Data.point)
         ? _circle(hook.area)
         : _polygon(hook.area);
+  }
+
+  void onSelectGroup(String group, int index) {
+    selectedGroup = group;
+    selectedGroupIdx = index;
+    getHookList("$group*");
   }
 
   void addNewHook() {
@@ -150,23 +160,22 @@ class GeofenceListComponent with Dragging implements OnInit, OnDestroy {
   }
 
   void delHook() {
-    if (selectedIdx == -1) return;
+    if (selectedHookIdx == -1) return;
     final request = DelHook();
-    request.pattern = hooks[selectedIdx].name;
+    request.pattern = hooks[selectedHookIdx].name;
     print("Deleting hook $request.pattern");
     final packet = Packet()..delHook = request;
     _protocol.send(packet);
   }
 
   void getHookList(String filter) {
-    selectedIdx = -1;
+    selectedHookIdx = -1;
     _selectedPath?.remove();
 
     if (filter is! String) filter = "";
 
     final request = GetHooks();
-    request.pattern = "${filter}*"; //append wildcard at the end
-    print("sending tho hook pattern: $filter");
+    request.pattern = filter;
     final packet = Packet()..getHooks = request;
     _protocol.send(packet);
   }

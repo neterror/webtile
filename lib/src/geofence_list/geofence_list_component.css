@@ -1,9 +1,16 @@
 .hook-list {
-    height: 200px;
+    padding: 10px;
+    height: 180px;
     border: 1px solid lightgray;
-    overflow-y: scroll;    
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
+.group-list {
+    height: 110px;
+    overflow-y: auto;
+    margin-bottom: 5px;
+}
 
 .row {
     display: flex;
@@ -13,7 +20,6 @@
 material-dialog material-button {
     margin: 30px;
 }
-
 
 .column {
     display: flex;
