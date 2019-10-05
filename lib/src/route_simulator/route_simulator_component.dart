@@ -39,7 +39,11 @@ import 'package:angular_bloc/angular_bloc.dart';
     ])
 class RouteSimulatorComponent {
   final _markers = [];
-  final _polyline = Polyline([]);
+  final _polyline = Polyline(
+      [],
+      PolylineOptions()
+        ..color = "black"
+        ..dashArray = "5");
   String newPathName = "";
   String newGroupName = "";
   String newVehicleId = "";
@@ -138,18 +142,28 @@ class RouteSimulatorComponent {
 
   void onPlayPath(VehiclePath path) async {
     var pos = LatLng(path.points.first.lat, path.points.first.lng);
-    var marker = Circle(pos, CircleOptions()..radius = 90);
+    var marker = Circle(
+        pos,
+        CircleOptions()
+          ..radius = 90
+          ..color = "black");
+    var sub = Stream.periodic(Duration(milliseconds: 50), (x) => x).listen((i) {
+      marker.setRadius(((i % 10) * 5).toDouble());
+    });
+
     marker.addTo(osm.map);
-    var stream = Stream.periodic(Duration(seconds: 1), (x) => x);
+    var stream = Stream.periodic(Duration(seconds: 2), (x) => x);
 
     await for (var i in stream) {
       if (i == path.points.length) {
+        await sub.cancel();
         break;
       }
       pos = LatLng(path.points[i].lat, path.points[i].lng);
       marker.setLatLng(pos);
     }
     print("stopping the simulator");
+
     marker.remove();
   }
 }
