@@ -20,7 +20,7 @@
                         route: {{path.name}} group: {{path.group}} vehicle: {{path.vehicleId}}
                     </div>
                     <div class="route-media-buttons">
-                        <material-button icon>
+                        <material-button icon (click)="onPlayPath(path)">
                             <material-icon icon="play_circle_outline"></material-icon>
                         </material-button>
 

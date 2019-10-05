@@ -90,8 +90,8 @@ class RouteSimulatorComponent {
   }
 
   void _finishPath() {
-    _polyline.setLatLngs([]);
     _polyline.remove();
+    _polyline.setLatLngs([]);
     _markers.forEach((x) => x.remove());
 
     _detachEvents();
@@ -118,8 +118,9 @@ class RouteSimulatorComponent {
       _finishPath();
       return;
     }
-    var path = VehiclePath(osm.map, newPathName, newGroupName, newVehicleId,
-        _polyline.getLatLngs());
+    var path = VehiclePath(
+        newPathName, newGroupName, newVehicleId, _polyline.getLatLngs());
+    print("adding path ${path.points}");
     paths.add(path);
     _finishPath();
   }
@@ -133,5 +134,22 @@ class RouteSimulatorComponent {
     _polyline.setLatLngs(path.points);
     _polyline.addTo(osm.map);
     print("selected path visualized");
+  }
+
+  void onPlayPath(VehiclePath path) async {
+    var pos = LatLng(path.points.first.lat, path.points.first.lng);
+    var marker = Circle(pos, CircleOptions()..radius = 90);
+    marker.addTo(osm.map);
+    var stream = Stream.periodic(Duration(seconds: 1), (x) => x);
+
+    await for (var i in stream) {
+      if (i == path.points.length) {
+        break;
+      }
+      pos = LatLng(path.points[i].lat, path.points[i].lng);
+      marker.setLatLng(pos);
+    }
+    print("stopping the simulator");
+    marker.remove();
   }
 }
