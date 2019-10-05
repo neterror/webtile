@@ -5,6 +5,7 @@ import 'package:angular_components/angular_components.dart';
 import 'package:angular_components/laminate/components/modal/modal.dart';
 import 'package:angular_forms/angular_forms.dart';
 import 'package:webtile38/src/map_component/open_street_map.dart';
+import 'package:webtile38/src/providers/datastore.dart';
 import 'vehicle_path.dart';
 import 'bloc/bloc.dart';
 import 'package:angular_bloc/angular_bloc.dart';
@@ -40,14 +41,17 @@ class RouteSimulatorComponent {
   final _markers = [];
   final _polyline = Polyline([]);
   String newPathName = "";
+  String newGroupName = "";
+  String newVehicleId = "";
+  final List<VehiclePath> paths;
+
+  RouteSimulatorComponent(DataStore store) : paths = store.routeSim;
 
   @Input()
   PathmakerBloc bloc;
 
   @Input()
   PathmakerState state;
-
-  final paths = <VehiclePath>[];
 
   @ViewChild(OpenStreetMap)
   OpenStreetMap osm;
@@ -95,6 +99,7 @@ class RouteSimulatorComponent {
   }
 
   void onNewPath() {
+    _finishPath();
     _attachEvents();
     _polyline.addTo(osm.map);
     bloc.dispatch(PathmakerActiveEvent());
@@ -113,12 +118,20 @@ class RouteSimulatorComponent {
       _finishPath();
       return;
     }
-    var path = VehiclePath(osm.map, newPathName, _polyline.getLatLngs());
+    var path = VehiclePath(osm.map, newPathName, newGroupName, newVehicleId,
+        _polyline.getLatLngs());
     paths.add(path);
     _finishPath();
   }
 
   void onPathCancel() {
     _finishPath();
+  }
+
+  void onSelectedPath(VehiclePath path, int index) {
+    _finishPath();
+    _polyline.setLatLngs(path.points);
+    _polyline.addTo(osm.map);
+    print("selected path visualized");
   }
 }

@@ -14,7 +14,7 @@ material-list {
 
 #add-btn {
     position: absolute;
-    right: 10px;
+    left: 10px;
     bottom: 20px;
 }
 
@@ -54,3 +54,12 @@ material-list {
     margin-bottom: 10px;
 }
 
+.route-option {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.route-label {
+    margin: auto;
+}

@@ -10,7 +10,6 @@ import 'package:webtile38/src/route_simulator/bloc/pathmaker_bloc.dart';
 import 'package:webtile38/src/route_simulator/route_simulator_component.dart';
 import 'package:webtile38/src/providers/tile38_proto.dart';
 import 'package:webtile38/src/providers/datastore.dart';
-import 'package:webtile38/src/route_simulator/route_simulator_component.dart';
 
 @Component(
     selector: 'my-app',

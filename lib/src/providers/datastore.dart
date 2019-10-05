@@ -1,9 +1,12 @@
 import 'dart:convert';
 import 'dart:html';
 import 'package:webtile38/src/fleet_editor/fleet_model.dart';
+import 'package:webtile38/src/route_simulator/vehicle_path.dart';
 
 class DataStore {
   final fleet = <FleetGroup>[];
+  final routeSim = <VehiclePath>[];
+
   DataStore() {
     load();
   }

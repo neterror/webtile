@@ -14,22 +14,47 @@
         </div>
 
         <material-list>
-            <material-select-item *ngFor="let path of paths">
-                {{path.name}}
+            <material-select-item *ngFor="let path of paths; let i = index" (trigger)="onSelectedPath(path, i)">
+                <div class="route-option">
+                    <div class="route-label">
+                        route: {{path.name}} group: {{path.group}} vehicle: {{path.vehicleId}}
+                    </div>
+                    <div class="route-media-buttons">
+                        <material-button icon>
+                            <material-icon icon="play_circle_outline"></material-icon>
+                        </material-button>
+
+                        <material-button icon>
+                            <material-icon icon="pause_circle_outline"></material-icon>
+                        </material-button>
+
+                        <material-button icon>
+                            <material-icon icon="loop"></material-icon>
+                        </material-button>
+                    </div>
+                </div>
+
+
+
             </material-select-item>
         </material-list>
 
-        <material-fab raised id="add-btn" (click)="onNewPath()">
-            <material-icon icon="add"> </material-icon>
-        </material-fab>
+    <material-fab raised id="add-btn" (click)="onNewPath()">
+        <material-icon icon="add"> </material-icon>
+    </material-fab>
 
     </div>
 
     <modal [visible]="true" *ngIf="readPathName">
         <material-dialog info>
             <div class="column">
-                <material-input [(ngModel)]="newPathName" autoFocus label="route name"></material-input>
-                <material-button raised (trigger)="onPathComplete">OK</material-button>
+                <material-input [required]="true" [(ngModel)]="newPathName" autoFocus label="route name">
+                </material-input>
+                <material-input [required]="true" [(ngModel)]="newGroupName" label="group"></material-input>
+                <material-input [required]="true" [(ngModel)]="newVehicleId" label="vehicle"></material-input>
+
+                <material-button [disabled]="newPathName.isEmpty || newGroupName.isEmpty || newVehicleId.isEmpty" raised
+                    (trigger)="onPathComplete">OK</material-button>
             </div>
         </material-dialog>
     </modal>

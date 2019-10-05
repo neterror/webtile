@@ -1,5 +1,3 @@
-import 'package:meta/meta.dart';
-
 abstract class PathmakerEvent {}
 
 class PathmakerActiveEvent extends PathmakerEvent {}

@@ -16,8 +16,5 @@ class DrawRectangle implements Draw {
   DrawRectangle(this._map, this._bloc, [this._label]);
 
   @override
-  set active(bool draw) {
-  }
-
-
+  set active(bool draw) {}
 }

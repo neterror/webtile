@@ -1,5 +1,4 @@
 import 'package:meta/meta.dart';
-import 'package:webtile38/src/toolbox/bloc/toolbox_event.dart';
 
 @immutable
 abstract class PathmakerState {}
