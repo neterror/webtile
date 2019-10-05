@@ -19,6 +19,7 @@ import 'package:angular_bloc/angular_bloc.dart';
       MaterialListComponent,
       MaterialFabComponent,
       MaterialIconComponent,
+      MaterialButtonComponent,
       OpenStreetMap,
     ],
     styleUrls: [
@@ -60,10 +61,30 @@ class RouteSimulatorComponent implements AfterViewInit, OnDestroy {
         (e) => bloc.dispatch(PathmakerPosEvent(e.latlng.lat, e.latlng.lng)));
   }
 
+  void _detachEvents() {
+    osm.map.off(E.click);
+    osm.map.off(E.mousemove);
+  }
+
   _mouseClick(LeafletMouseEvent e) {
     if ((e.originalEvent as MouseEvent).button == 0) {
       var marker = Marker(e.latlng);
       marker.addTo(osm.map);
-    } else {}
+    } else {
+      bloc.dispatch(PathmakerInactiveEvent());
+    }
+  }
+
+  void _finishPath() {
+    _detachEvents();
+    bloc.dispatch(PathmakerInactiveEvent());
+  }
+
+  void onPathOk() {
+    _finishPath();
+  }
+
+  void onPathCancel() {
+    _finishPath();
   }
 }

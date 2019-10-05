@@ -7,7 +7,13 @@
 
 
     <div class="relative">
-        <div id="cover" *ngIf="activeDraw"> </div>
+        <div id="cover" *ngIf="activeDraw">
+            <h2> Click on the map to create the route </h2>
+            <div class="row">
+                <material-button raised (click)="onPathOk"> OK </material-button>
+                <material-button raised (click)="onPathCancel"> Cancel </material-button>
+            </div>
+        </div>
 
         <material-list>
             <material-select-item *ngFor="let path of paths">
