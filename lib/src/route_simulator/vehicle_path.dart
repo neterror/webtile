@@ -3,7 +3,7 @@ import 'package:dartleaf/dartleaf.dart';
 class VehiclePath {
   final LeafletMap _map;
   final String name;
-//  final Path _path;
+  final List _points;
 
-  VehiclePath(this._map, this.name) {}
+  VehiclePath(this._map, this.name, this._points) {}
 }

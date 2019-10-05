@@ -2,6 +2,8 @@ import 'dart:html';
 import 'package:dartleaf/dartleaf.dart';
 import 'package:angular/angular.dart';
 import 'package:angular_components/angular_components.dart';
+import 'package:angular_components/laminate/components/modal/modal.dart';
+import 'package:angular_forms/angular_forms.dart';
 import 'package:webtile38/src/map_component/open_street_map.dart';
 import 'vehicle_path.dart';
 import 'bloc/bloc.dart';
@@ -13,19 +15,32 @@ import 'package:angular_bloc/angular_bloc.dart';
     pipes: [
       BlocPipe
     ],
+    providers: [
+      materialProviders
+    ],
     directives: [
+      formDirectives,
       coreDirectives,
       MaterialSelectItemComponent,
       MaterialListComponent,
       MaterialFabComponent,
       MaterialIconComponent,
       MaterialButtonComponent,
+      ModalComponent,
+      MaterialDialogComponent,
+      MaterialInputComponent,
+      materialInputDirectives,
+      AutoFocusDirective,
       OpenStreetMap,
     ],
     styleUrls: [
       'route_simulator_component.css'
     ])
-class RouteSimulatorComponent implements AfterViewInit, OnDestroy {
+class RouteSimulatorComponent {
+  final _markers = [];
+  final _polyline = Polyline([]);
+  String newPathName = "";
+
   @Input()
   PathmakerBloc bloc;
 
@@ -37,50 +52,69 @@ class RouteSimulatorComponent implements AfterViewInit, OnDestroy {
   @ViewChild(OpenStreetMap)
   OpenStreetMap osm;
 
-  @override
-  void ngAfterViewInit() {
-    paths.add(VehiclePath(osm.map, "Route1"));
-    paths.add(VehiclePath(osm.map, "Route2"));
-    paths.add(VehiclePath(osm.map, "Route66"));
-  }
-
-  @override
-  void ngOnDestroy() {}
-
-  void onNewRoute() {
-    _attachEvents();
-    bloc.dispatch(PathmakerActiveEvent());
-  }
-
   bool get activeDraw => state is! PathmakerInactiveState;
   bool get reportingPos => state is PathmakerPosState;
+  bool get readPathName => state is PathmakerPathNameState;
 
   void _attachEvents() {
-    osm.map.on(E.click, _mouseClick);
+    osm.map.on(E.mousedown, _mouseDown);
     osm.map.on(E.mousemove,
         (e) => bloc.dispatch(PathmakerPosEvent(e.latlng.lat, e.latlng.lng)));
   }
 
   void _detachEvents() {
-    osm.map.off(E.click);
+    osm.map.off(E.mousedown);
     osm.map.off(E.mousemove);
   }
 
-  _mouseClick(LeafletMouseEvent e) {
-    if ((e.originalEvent as MouseEvent).button == 0) {
-      var marker = Marker(e.latlng);
+  void _mouseDown(LeafletMouseEvent e) {
+    bool leftMouseBtn = ((e.originalEvent as MouseEvent).button == 0);
+    if (leftMouseBtn) {
+      var marker = Circle(e.latlng, CircleOptions()..radius = 20);
       marker.addTo(osm.map);
+      _markers.add(marker);
+      _polyline.addLatLng(e.latlng);
     } else {
-      bloc.dispatch(PathmakerInactiveEvent());
+      var points = _polyline.getLatLngs();
+      if (points.isNotEmpty) {
+        points.removeLast();
+        _polyline.setLatLngs(points);
+        _markers.last.remove();
+        _markers.removeLast();
+      }
     }
   }
 
   void _finishPath() {
+    _polyline.setLatLngs([]);
+    _polyline.remove();
+    _markers.forEach((x) => x.remove());
+
     _detachEvents();
     bloc.dispatch(PathmakerInactiveEvent());
   }
 
+  void onNewPath() {
+    _attachEvents();
+    _polyline.addTo(osm.map);
+    bloc.dispatch(PathmakerActiveEvent());
+  }
+
   void onPathOk() {
+    if (_markers.isEmpty) {
+      _finishPath();
+    } else {
+      bloc.dispatch(PathmakerPathNameEvent());
+    }
+  }
+
+  void onPathComplete() {
+    if (newPathName is! String || newPathName.isEmpty) {
+      _finishPath();
+      return;
+    }
+    var path = VehiclePath(osm.map, newPathName, _polyline.getLatLngs());
+    paths.add(path);
     _finishPath();
   }
 

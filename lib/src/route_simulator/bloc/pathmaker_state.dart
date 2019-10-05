@@ -1,4 +1,5 @@
 import 'package:meta/meta.dart';
+import 'package:webtile38/src/toolbox/bloc/toolbox_event.dart';
 
 @immutable
 abstract class PathmakerState {}
@@ -18,3 +19,5 @@ class PathmakerPosState extends PathmakerState {
   String toString() =>
       "lat: ${lat.toStringAsFixed(5)}  lng: ${lng.toStringAsFixed(6)}";
 }
+
+class PathmakerPathNameState extends PathmakerState {}

@@ -11,3 +11,5 @@ class PathmakerPosEvent extends PathmakerEvent {
   final double lng;
   PathmakerPosEvent(this.lat, this.lng);
 }
+
+class PathmakerPathNameEvent extends PathmakerEvent {}
