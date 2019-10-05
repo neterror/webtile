@@ -1,0 +1,25 @@
+<div class="relative">
+    <open-street-map #map [style]="{'width': '100%', 'height': '400px'}"> </open-street-map>
+
+    <div *ngIf="reportingPos" id="position-label">
+        {{state}}
+    </div>
+
+
+    <div class="relative">
+        <div id="cover" *ngIf="activeDraw"> </div>
+
+        <material-list>
+            <material-select-item *ngFor="let path of paths">
+                {{path.name}}
+            </material-select-item>
+        </material-list>
+
+        <material-fab mini raised id="add-btn" (click)="onNewRoute()">
+            <material-icon icon="add"> </material-icon>
+        </material-fab>
+
+    </div>
+
+
+</div>

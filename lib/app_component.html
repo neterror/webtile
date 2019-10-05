@@ -3,6 +3,8 @@
 
 <div [ngSwitch]="activeTab" id="main">
     <map-editor *ngSwitchCase="0"> </map-editor>
-    <fleet-editor *ngSwitchCase="1"> </fleet-editor>
-    <tile38-cli *ngSwitchCase="2" [bloc]="cliBloc " [state]="cliBloc | bloc "> </tile38-cli>
+    <route-simulator *ngSwitchCase="1" [bloc]="pathmakerBloc" [state]="pathmakerBloc | bloc"></route-simulator>
+    <fleet-editor *ngSwitchCase="2"> </fleet-editor>
+    <tile38-cli *ngSwitchCase="3" [bloc]="cliBloc " [state]="cliBloc | bloc "> </tile38-cli>
+
 </div>

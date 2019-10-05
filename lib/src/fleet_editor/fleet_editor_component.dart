@@ -36,7 +36,6 @@ class FleetEditorComponent implements OnDestroy {
   DataStore _store;
 
   FleetEditorComponent(this._store) : fleet = _store.fleet {
-    print("the new fleet is $fleet");
     selectedGroup = 0;
   }
   String inputLabel;
