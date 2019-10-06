@@ -5,22 +5,26 @@ import 'shape.dart';
 
 class PolygonShape extends Shape {
   final LeafletMap _map;
-  final Polyline _polyline;
+  final Polygon _polygon;
   CircleMarker _marker;
-  PolygonShape(this._map, String label, this._polyline, [AreaBloc bloc]) : super(_polyline, bloc) {
+  PolygonShape(this._map, String label, this._polygon, [AreaBloc bloc])
+      : super(_polygon, bloc) {
     _createLabel(label);
   }
 
   @override
-  GeoJson toGeoJson() => _polyline.toGeoJSON(); 
+  GeoJson toGeoJson() => _polygon.toGeoJSON();
 
   @override
   String get description {
-    var obj = _polyline.toGeoJSON();
-    var result = {"type": obj.type, "geometry": {
-      "type": obj.geometry.type,
-      "coordinates": obj.geometry.coordinates
-    }};
+    var obj = _polygon.toGeoJSON();
+    var result = {
+      "type": obj.type,
+      "geometry": {
+        "type": obj.geometry.type,
+        "coordinates": obj.geometry.coordinates
+      }
+    };
     return jsonEncode(result);
   }
 
@@ -30,7 +34,7 @@ class PolygonShape extends Shape {
   }
 
   _createLabel(String text) {
-    var center = _polyline.getBounds().getCenter();
+    var center = _polygon.getBounds().getCenter();
     var tooltipOptions = TooltipOptions()
       ..className = "geofence-labels"
       ..direction = 'center'
@@ -46,7 +50,7 @@ class PolygonShape extends Shape {
   }
 
   dispose() {
-    _polyline?.remove();
+    _polygon?.remove();
     _marker?.remove();
   }
 }
