@@ -27,7 +27,7 @@ class AreaUtils {
     var options = ll.CircleOptions()..radius = radius;
     if (color is String) options.color = color;
     final marker = ll.Circle(pos, options);
-
+    marker.addTo(_osm.map);
     return marker;
   }
 
@@ -48,7 +48,7 @@ class AreaUtils {
       var latlng = ll.LatLng(pos[1], pos[0]);
       coordinates.add(latlng);
     }
-    ll.Polygon result = ll.Polygon(coordinates);
+    final result = ll.Polygon(coordinates);
     result.addTo(_osm.map);
     var center = result.getCenter();
     if (focus) _osm.map.setView(center, focusZoom);

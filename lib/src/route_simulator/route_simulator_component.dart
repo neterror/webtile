@@ -55,13 +55,11 @@ class RouteSimulatorComponent implements OnInit, OnDestroy {
   final List<VehiclePath> paths;
   final Tile38Proto _protocol;
   List<pb.Hook> _hooks;
-  AreaUtils _area;
 
   StreamSubscription _subscription;
   RouteSimulatorComponent(DataStore store, this._protocol)
       : paths = store.routeSim {
     _subscription = _protocol.received.listen(_onReceived);
-    _area = AreaUtils(osm);
   }
 
   @override
@@ -103,7 +101,8 @@ class RouteSimulatorComponent implements OnInit, OnDestroy {
   void _mouseDown(LeafletMouseEvent e) {
     bool leftMouseBtn = ((e.originalEvent as MouseEvent).button == 0);
     if (leftMouseBtn) {
-      var marker = _area.circleFromPoint(e.latlng, radius: 20);
+      var a = AreaUtils(osm);
+      var marker = a.circleFromPoint(e.latlng, radius: 20, color: "blue");
       _markers.add(marker);
       _polyline.addLatLng(e.latlng);
     } else {
@@ -165,16 +164,18 @@ class RouteSimulatorComponent implements OnInit, OnDestroy {
     _polyline.addTo(osm.map);
   }
 
+  Stream<int> _timeSeq(Duration duration) =>
+      Stream.periodic(duration, (x) => x);
+
   void onPlayPath(VehiclePath path) async {
     var p = path.points.first;
-    var marker = _area.circleFromPoint(p, radius: 90, color: "black");
-    final sub = Stream.periodic(Duration(milliseconds: 100), (x) => x).listen(
-        (i) => marker.setRadius(((i % 10) * 5).toDouble())); //radius animation
+    var a = AreaUtils(osm);
+    var marker = a.circleFromPoint(p, radius: 90, color: "black");
+    final sub = _timeSeq(Duration(milliseconds: 100))
+        .listen((i) => marker.setRadius(((i % 10) * 5).toDouble()));
 
     marker.addTo(osm.map);
-    final stream = Stream.periodic(Duration(seconds: 2), (x) => x);
-
-    await for (var i in stream) {
+    await for (var i in _timeSeq(Duration(seconds: 1))) {
       if (i == path.points.length) {
         await sub.cancel();
         break;
@@ -220,9 +221,19 @@ class RouteSimulatorComponent implements OnInit, OnDestroy {
     _showArea(active.area);
   }
 
-  void _showArea(pb.Area area) {}
+  void _showArea(pb.Area area) async {
+    var path = _createPath(area);
+    await for (var i in _timeSeq(Duration(milliseconds: 100))) {
+      path.setStyle(PathOptions()..opacity = 1 - (0.1 * i));
+      if (i >= 10) break;
+    }
+    path.remove();
+  }
 
-  Path _createPath(pb.Area area) => (area.whichData() == pb.Area_Data.point)
-      ? _area.circleFromArea(area)
-      : _area.polygon(area);
+  Path _createPath(pb.Area area) {
+    final a = AreaUtils(osm);
+    return (area.whichData() == pb.Area_Data.point)
+        ? a.circleFromArea(area)
+        : a.polygon(area);
+  }
 }
