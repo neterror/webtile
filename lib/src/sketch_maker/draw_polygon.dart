@@ -150,6 +150,7 @@ class DrawPolygon implements Draw {
   _finish(Polyline polyline) {
     polyline.addLatLng(_firstMark.getLatLng());
     var polygon = Polygon(polyline.getLatLngs());
+    polyline.remove();
     var shape = PolygonShape(_map, _label, polygon, _bloc);
     _bloc.dispatch(AreaCreatedEvent(shape));
     _reset();

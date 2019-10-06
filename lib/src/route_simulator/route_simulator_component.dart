@@ -12,6 +12,7 @@ import 'vehicle_path.dart';
 import 'bloc/bloc.dart';
 import 'package:angular_bloc/angular_bloc.dart';
 import 'package:webtile38/src/gen/tile38.pb.dart' as pb;
+import 'package:webtile38/src/toolbox/area_utils.dart';
 
 @Component(
     selector: 'route-simulator',
@@ -40,7 +41,7 @@ import 'package:webtile38/src/gen/tile38.pb.dart' as pb;
     styleUrls: [
       'route_simulator_component.css'
     ])
-class RouteSimulatorComponent implements OnDestroy {
+class RouteSimulatorComponent implements OnInit, OnDestroy {
   final _markers = [];
   final _polyline = Polyline(
       [],
@@ -53,11 +54,21 @@ class RouteSimulatorComponent implements OnDestroy {
   int selectedRoute = -1;
   final List<VehiclePath> paths;
   final Tile38Proto _protocol;
+  List<pb.Hook> _hooks;
+  AreaUtils _area;
 
   StreamSubscription _subscription;
   RouteSimulatorComponent(DataStore store, this._protocol)
       : paths = store.routeSim {
     _subscription = _protocol.received.listen(_onReceived);
+    _area = AreaUtils(osm);
+  }
+
+  @override
+  void ngOnInit() {
+    final request = pb.GetHooks()..pattern = "*";
+    final packet = pb.Packet()..getHooks = request;
+    _protocol.send(packet);
   }
 
   @override
@@ -92,8 +103,7 @@ class RouteSimulatorComponent implements OnDestroy {
   void _mouseDown(LeafletMouseEvent e) {
     bool leftMouseBtn = ((e.originalEvent as MouseEvent).button == 0);
     if (leftMouseBtn) {
-      var marker = Circle(e.latlng, CircleOptions()..radius = 20);
-      marker.addTo(osm.map);
+      var marker = _area.circleFromPoint(e.latlng, radius: 20);
       _markers.add(marker);
       _polyline.addLatLng(e.latlng);
     } else {
@@ -156,16 +166,10 @@ class RouteSimulatorComponent implements OnDestroy {
   }
 
   void onPlayPath(VehiclePath path) async {
-    var pos = LatLng(path.points.first.lat, path.points.first.lng);
-    final marker = Circle(
-        pos,
-        CircleOptions()
-          ..radius = 90
-          ..color = "black");
-    final sub =
-        Stream.periodic(Duration(milliseconds: 100), (x) => x).listen((i) {
-      marker.setRadius(((i % 10) * 5).toDouble());
-    });
+    var p = path.points.first;
+    var marker = _area.circleFromPoint(p, radius: 90, color: "black");
+    final sub = Stream.periodic(Duration(milliseconds: 100), (x) => x).listen(
+        (i) => marker.setRadius(((i % 10) * 5).toDouble())); //radius animation
 
     marker.addTo(osm.map);
     final stream = Stream.periodic(Duration(seconds: 2), (x) => x);
@@ -175,12 +179,10 @@ class RouteSimulatorComponent implements OnDestroy {
         await sub.cancel();
         break;
       }
-      pos = LatLng(path.points[i].lat, path.points[i].lng);
+      var pos = LatLng(path.points[i].lat, path.points[i].lng);
       marker.setLatLng(pos);
       _reportPosition(path, i);
     }
-    print("stopping the simulator");
-
     marker.remove();
   }
 
@@ -204,9 +206,23 @@ class RouteSimulatorComponent implements OnDestroy {
     if (packet is! pb.Packet) return;
     switch (packet.whichData()) {
       case pb.Packet_Data.geofenceEvent:
-        print("geofence event: ${packet.geofenceEvent}");
+        _geofenceEvent(packet.geofenceEvent);
+        break;
+      case pb.Packet_Data.hookList:
+        _hooks = packet.hookList.items;
         break;
       default:
     }
   }
+
+  void _geofenceEvent(pb.GeofenceEvent e) {
+    var active = _hooks.firstWhere((x) => x.name == e.hook);
+    _showArea(active.area);
+  }
+
+  void _showArea(pb.Area area) {}
+
+  Path _createPath(pb.Area area) => (area.whichData() == pb.Area_Data.point)
+      ? _area.circleFromArea(area)
+      : _area.polygon(area);
 }

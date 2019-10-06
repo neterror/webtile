@@ -1,5 +1,3 @@
-import 'package:dartleaf/dartleaf.dart';
-
 class VehiclePath {
   final String name;
   final List points;

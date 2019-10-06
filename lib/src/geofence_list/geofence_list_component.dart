@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:async';
 import 'package:angular/angular.dart';
 import 'package:angular_components/angular_components.dart';
@@ -9,6 +8,7 @@ import 'package:webtile38/src/gen/tile38.pb.dart';
 import 'package:webtile38/src/map_component/open_street_map.dart';
 import 'package:webtile38/src/providers/tile38_proto.dart';
 import 'package:webtile38/src/toolbox/fence_toolbox.dart';
+import 'package:webtile38/src/toolbox/area_utils.dart';
 import 'package:webtile38/src/toolbox/bloc/bloc.dart';
 import 'package:dartleaf/dartleaf.dart' as ll;
 import 'package:angular_components/laminate/components/modal/modal.dart';
@@ -46,7 +46,7 @@ class _LastStatus {
       AutoDismissDirective,
       ModalComponent
     ])
-class GeofenceListComponent with Dragging implements OnInit, OnDestroy {
+class GeofenceListComponent with Dragging implements AfterViewInit, OnDestroy {
   Tile38Proto _protocol;
   final List<String> groups;
   String enteredFilter;
@@ -63,7 +63,7 @@ class GeofenceListComponent with Dragging implements OnInit, OnDestroy {
   ll.Path _selectedPath;
 
   @Input()
-  OpenStreetMap map;
+  OpenStreetMap osm;
 
   final fenceToolboxBloc = ToolboxBloc(); //toolbox appearance
 
@@ -77,8 +77,9 @@ class GeofenceListComponent with Dragging implements OnInit, OnDestroy {
   }
 
   @override
-  void ngOnInit() {
+  void ngAfterViewInit() {
     _sub = _protocol.received.listen(_onReceived);
+
     initDragging(container: "#map-editor");
     makeDraggable("#fence", fenceToolboxBloc);
   }
@@ -108,45 +109,13 @@ class GeofenceListComponent with Dragging implements OnInit, OnDestroy {
     }
   }
 
-  ll.Path _circle(Area area) {
-    final p = area.point;
-    var center = ll.LatLng(p.center.lat, p.center.lng);
-    var result = ll.Circle(center, ll.CircleOptions(radius: p.radius));
-    map.map.setView(center, 14);
-    result.addTo(map.map);
-    return result;
-  }
-
-  ll.Path _polygon(Area area) {
-    final json = jsonDecode(area.json.value);
-    var coordinates = [];
-    var list = json["geometry"]["coordinates"];
-    if (list.isEmpty) {
-      print("empty polygon coordinates");
-      return null;
-    }
-    if (list[0][0] is List) {
-      //LineSegment is list of pairs, Polyline is list of list of pairs ... !@#
-      list = list[0];
-    }
-
-    for (var pos in list) {
-      var latlng = ll.LatLng(pos[1], pos[0]);
-      coordinates.add(latlng);
-    }
-    ll.Polygon result = ll.Polygon(coordinates);
-    result.addTo(map.map);
-    var center = result.getCenter();
-    map.map.setView(center, 14);
-    return result;
-  }
-
   void onSelectedHook(Hook hook, int index) {
     selectedHookIdx = index;
     _selectedPath?.remove();
+    final area = AreaUtils(osm);
     _selectedPath = (hook.area.whichData() == Area_Data.point)
-        ? _circle(hook.area)
-        : _polygon(hook.area);
+        ? area.circleFromArea(hook.area, focus: true, focusZoom: 14)
+        : area.polygon(hook.area, focus: true, focusZoom: 14);
   }
 
   void onSelectGroup(String group, int index) {
