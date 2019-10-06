@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:html';
 import 'package:dartleaf/dartleaf.dart';
 import 'package:angular/angular.dart';
@@ -6,9 +7,11 @@ import 'package:angular_components/laminate/components/modal/modal.dart';
 import 'package:angular_forms/angular_forms.dart';
 import 'package:webtile38/src/map_component/open_street_map.dart';
 import 'package:webtile38/src/providers/datastore.dart';
+import 'package:webtile38/src/providers/tile38_proto.dart';
 import 'vehicle_path.dart';
 import 'bloc/bloc.dart';
 import 'package:angular_bloc/angular_bloc.dart';
+import 'package:webtile38/src/gen/tile38.pb.dart' as pb;
 
 @Component(
     selector: 'route-simulator',
@@ -37,7 +40,7 @@ import 'package:angular_bloc/angular_bloc.dart';
     styleUrls: [
       'route_simulator_component.css'
     ])
-class RouteSimulatorComponent {
+class RouteSimulatorComponent implements OnDestroy {
   final _markers = [];
   final _polyline = Polyline(
       [],
@@ -47,9 +50,20 @@ class RouteSimulatorComponent {
   String newPathName = "";
   String newGroupName = "";
   String newVehicleId = "";
+  int selectedRoute = -1;
   final List<VehiclePath> paths;
+  final Tile38Proto _protocol;
 
-  RouteSimulatorComponent(DataStore store) : paths = store.routeSim;
+  StreamSubscription _subscription;
+  RouteSimulatorComponent(DataStore store, this._protocol)
+      : paths = store.routeSim {
+    _subscription = _protocol.received.listen(_onReceived);
+  }
+
+  @override
+  ngOnDestroy() {
+    _subscription.cancel();
+  }
 
   @Input()
   PathmakerBloc bloc;
@@ -126,6 +140,7 @@ class RouteSimulatorComponent {
         newPathName, newGroupName, newVehicleId, _polyline.getLatLngs());
     print("adding path ${path.points}");
     paths.add(path);
+
     _finishPath();
   }
 
@@ -134,25 +149,26 @@ class RouteSimulatorComponent {
   }
 
   void onSelectedPath(VehiclePath path, int index) {
+    selectedRoute = index;
     _finishPath();
     _polyline.setLatLngs(path.points);
     _polyline.addTo(osm.map);
-    print("selected path visualized");
   }
 
   void onPlayPath(VehiclePath path) async {
     var pos = LatLng(path.points.first.lat, path.points.first.lng);
-    var marker = Circle(
+    final marker = Circle(
         pos,
         CircleOptions()
           ..radius = 90
           ..color = "black");
-    var sub = Stream.periodic(Duration(milliseconds: 50), (x) => x).listen((i) {
+    final sub =
+        Stream.periodic(Duration(milliseconds: 100), (x) => x).listen((i) {
       marker.setRadius(((i % 10) * 5).toDouble());
     });
 
     marker.addTo(osm.map);
-    var stream = Stream.periodic(Duration(seconds: 2), (x) => x);
+    final stream = Stream.periodic(Duration(seconds: 2), (x) => x);
 
     await for (var i in stream) {
       if (i == path.points.length) {
@@ -161,9 +177,36 @@ class RouteSimulatorComponent {
       }
       pos = LatLng(path.points[i].lat, path.points[i].lng);
       marker.setLatLng(pos);
+      _reportPosition(path, i);
     }
     print("stopping the simulator");
 
     marker.remove();
+  }
+
+  void _reportPosition(VehiclePath path, int pos) {
+    final cmd = pb.SetObj()
+      ..group = path.group
+      ..object = path.vehicleId
+      ..area = pb.Area();
+    cmd.area.point = pb.Point();
+    var c = pb.LatLng()
+      ..lat = path.points[pos].lat
+      ..lng = path.points[pos].lng;
+    cmd.area.point.center = c;
+    cmd.area.point.radius = 0;
+
+    final packet = pb.Packet()..setObj = cmd;
+    _protocol.send(packet);
+  }
+
+  void _onReceived(dynamic packet) {
+    if (packet is! pb.Packet) return;
+    switch (packet.whichData()) {
+      case pb.Packet_Data.geofenceEvent:
+        print("geofence event: ${packet.geofenceEvent}");
+        break;
+      default:
+    }
   }
 }

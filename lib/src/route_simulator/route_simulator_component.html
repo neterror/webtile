@@ -3,7 +3,6 @@
 
     <div *ngIf="reportingPos" id="position-label"> {{state}} </div>
 
-
     <div class="relative">
         <div id="cover" *ngIf="activeDraw">
             <h2> Click on the map to create the route </h2>
@@ -14,7 +13,7 @@
         </div>
 
         <material-list>
-            <material-select-item *ngFor="let path of paths; let i = index" (trigger)="onSelectedPath(path, i)">
+            <material-select-item *ngFor="let path of paths; let i = index" [selected]="i == selectedRoute" (trigger)="onSelectedPath(path, i)">
                 <div class="route-option">
                     <div class="route-label">
                         route: {{path.name}} group: {{path.group}} vehicle: {{path.vehicleId}}
