@@ -164,18 +164,18 @@ class RouteSimulatorComponent implements OnInit, OnDestroy {
     _polyline.addTo(osm.map);
   }
 
-  Stream<int> _timeSeq(Duration duration) =>
-      Stream.periodic(duration, (x) => x);
+  Stream<int> _timeSeq(int milliseconds) =>
+      Stream.periodic(Duration(milliseconds: milliseconds), (x) => x);
 
   void onPlayPath(VehiclePath path) async {
     var p = path.points.first;
     var a = AreaUtils(osm);
     var marker = a.circleFromPoint(p, radius: 90, color: "black");
-    final sub = _timeSeq(Duration(milliseconds: 100))
+    final sub = _timeSeq(100)
         .listen((i) => marker.setRadius(((i % 10) * 5).toDouble()));
 
     marker.addTo(osm.map);
-    await for (var i in _timeSeq(Duration(seconds: 1))) {
+    await for (var i in _timeSeq(1500)) {
       if (i == path.points.length) {
         await sub.cancel();
         break;
@@ -217,16 +217,23 @@ class RouteSimulatorComponent implements OnInit, OnDestroy {
   }
 
   void _geofenceEvent(pb.GeofenceEvent e) {
+    print("event e: ${e}");
     var active = _hooks.firstWhere((x) => x.name == e.hook);
     _showArea(active.area);
   }
 
   void _showArea(pb.Area area) async {
     var path = _createPath(area);
-    await for (var i in _timeSeq(Duration(milliseconds: 100))) {
-      path.setStyle(PathOptions()..opacity = 1 - (0.1 * i));
+    final options = PathOptions();
+    options.color = "red";
+    options.opacity = 1.0;
+    options.stroke = false;
+    await for (var i in _timeSeq(100)) {
+      options.opacity = 1 - (0.1 * i);
+      path.setStyle(options);
       if (i >= 10) break;
     }
+    print("clearing the area");
     path.remove();
   }
 
@@ -234,6 +241,6 @@ class RouteSimulatorComponent implements OnInit, OnDestroy {
     final a = AreaUtils(osm);
     return (area.whichData() == pb.Area_Data.point)
         ? a.circleFromArea(area)
-        : a.polygon(area);
+        : a.polygon(area, color: "red", stroke: false);
   }
 }

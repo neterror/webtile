@@ -9,10 +9,12 @@ class AreaUtils {
   AreaUtils(this._osm);
 
   ll.Path circleFromArea(Area area,
-      {bool focus = false, double focusZoom = 14}) {
+      {bool focus = false, double focusZoom = 14, String color}) {
     final p = area.point;
     var center = ll.LatLng(p.center.lat, p.center.lng);
-    var result = ll.Circle(center, ll.CircleOptions(radius: p.radius));
+    var options = ll.CircleOptions(radius: p.radius);
+    if (color is String) options.color = color;
+    var result = ll.Circle(center, options);
     if (focus) _osm.map.setView(center, focusZoom);
     result.addTo(_osm.map);
     return result;
@@ -31,7 +33,11 @@ class AreaUtils {
     return marker;
   }
 
-  ll.Path polygon(Area area, {bool focus = false, double focusZoom = 14}) {
+  ll.Path polygon(Area area,
+      {bool focus = false,
+      double focusZoom = 14,
+      String color,
+      bool stroke = true}) {
     final json = jsonDecode(area.json.value);
     var coordinates = [];
     var list = json["geometry"]["coordinates"];
@@ -48,7 +54,10 @@ class AreaUtils {
       var latlng = ll.LatLng(pos[1], pos[0]);
       coordinates.add(latlng);
     }
-    final result = ll.Polygon(coordinates);
+    var options = ll.PathOptions();
+    options.stroke = stroke;
+    if (options is String) options.color = color;
+    final result = ll.Polygon(coordinates, options);
     result.addTo(_osm.map);
     var center = result.getCenter();
     if (focus) _osm.map.setView(center, focusZoom);
