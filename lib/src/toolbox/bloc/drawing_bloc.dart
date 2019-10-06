@@ -28,11 +28,11 @@ class SketchBloc extends Bloc<OptionsEvent, DrawingState> {
     DrawingState result = InactiveDrawingState();
 
     if (event is PolygonOptionEvent) {
-      _draw = DrawPolygon(map.map, _areaBloc, event.text);
+      _draw = DrawPolygon(map.map, _areaBloc, event.label);
     } else if (event is RectangleOptionEvent) {
-      _draw = DrawRectangle(map.map, _areaBloc, event.text);
+      _draw = DrawRectangle(map.map, _areaBloc, event.label);
     } else if (event is CircleOptionEvent) {
-      _draw = DrawCircle(map.map, _areaBloc, event.text);
+      _draw = DrawCircle(map.map, _areaBloc, event.label);
     }
 
     if (_draw is Draw) {

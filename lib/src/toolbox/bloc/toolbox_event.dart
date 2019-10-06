@@ -10,6 +10,8 @@ class ShowToolEvent extends ToolboxEvent {
 
 class HideToolEvent extends ToolboxEvent {}
 
+class InvisibleToolEvent extends ToolboxEvent {}
+
 class MoveToolEvent extends ToolboxEvent {
   final List<int> position;
   MoveToolEvent(this.position);

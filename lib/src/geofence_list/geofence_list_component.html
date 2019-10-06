@@ -12,7 +12,8 @@
 
             <div class="row">
                 <material-button (click)="addNewHook" raised> New </material-button>
-                <material-button (click)="delHook" raised [disabled]="selectedHookIdx == null"> Remove </material-button>
+                <material-button (click)="delHook" raised [disabled]="selectedHookIdx == null"> Remove
+                </material-button>
             </div>
         </div>
 
@@ -33,6 +34,7 @@
         </material-dialog>
     </modal>
 
-    <fence-toolbox id="fence" [state]="fenceToolboxBloc | bloc" [map]="osm" (created)="onHookCreated"> </fence-toolbox>
+    <fence-toolbox id="fence" [state]="fenceToolboxBloc | bloc" [map]="osm"
+        (created)="onHookCreated"> </fence-toolbox>
 
 </div>

@@ -23,17 +23,25 @@
     align-items: flex-start;
 }
 
+.draw-menu {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid lightgray;
+    border-radius: 5px;
+    padding: 5px;
+    margin-bottom: 20px;
+}
+.draw-menu p {
+    margin: auto;
+}
 .fence {
     margin: 20px;
 }
-.fence-commands material-auto-suggest-input {
-    width: 90px;
-}
 
-.fence-object material-input {
-    width: 300px;
+.fence-select-btn {
+    margin-bottom: 40px;
 }
-
 .shown {
     z-index: 1000;
     opacity: 1.0;

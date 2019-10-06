@@ -98,8 +98,6 @@ class GeofenceListComponent with Dragging implements AfterViewInit, OnDestroy {
       case Packet_Data.hookList:
         hooks = packet.hookList.items;
         break;
-      case Packet_Data.geofenceEvent:
-        break;
       case Packet_Data.status:
         lastStatus.success = packet.status.success;
         lastStatus.message = packet.status.message;
@@ -125,7 +123,7 @@ class GeofenceListComponent with Dragging implements AfterViewInit, OnDestroy {
   }
 
   void addNewHook() {
-    fenceToolboxBloc.dispatch(ShowToolEvent([100, 100]));
+    fenceToolboxBloc.dispatch(ShowToolEvent([180, 350]));
   }
 
   void delHook() {

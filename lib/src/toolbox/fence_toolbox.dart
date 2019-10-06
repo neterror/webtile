@@ -2,12 +2,19 @@ import 'dart:async';
 import 'package:angular_bloc/angular_bloc.dart';
 import 'package:angular/angular.dart';
 import 'package:angular_components/angular_components.dart';
+import 'package:webtile38/src/sketch_maker/circle_shape.dart';
 import 'package:webtile38/src/toolbox/bloc/bloc.dart';
 import 'package:webtile38/src/toolbox/toolbox.dart';
 import 'package:webtile38/src/toolbox/dragging.dart';
 import 'package:webtile38/src/providers/datastore.dart';
 import 'package:webtile38/src/map_component/open_street_map.dart';
 import 'package:webtile38/src/gen/tile38.pb.dart';
+
+class _Detect {
+  Detection detection;
+  bool selected = false;
+  _Detect(this.detection);
+}
 
 @Component(
     selector: 'fence-toolbox',
@@ -27,6 +34,8 @@ import 'package:webtile38/src/gen/tile38.pb.dart';
       MaterialRadioComponent,
       MaterialRadioGroupComponent,
       MaterialButtonComponent,
+      MaterialCheckboxComponent,
+      MaterialIconComponent,
       ToolboxComponent
     ],
     pipes: [
@@ -38,30 +47,40 @@ import 'package:webtile38/src/gen/tile38.pb.dart';
 class FenceToolboxComponent with Dragging implements OnDestroy {
   final _streamCtrl = StreamController<CreateHook>();
   final hook = Hook();
-  final drawToolboxBloc = ToolboxBloc(); //toolbox appearance
-  final areasBloc = AreaBloc(); //final shapes processor
-
   final allCommands = Command.values.map((c) => c.name).toList();
-  final allDetections = Detection.values.map((c) => c.name).toList();
+  bool selectingArea = false;
 
   StreamSubscription _subscription;
 
   String areaText;
+  final detectOptions = <_Detect>[
+    _Detect(Detection.enter),
+    _Detect(Detection.leave),
+    _Detect(Detection.inside),
+    _Detect(Detection.outside),
+    _Detect(Detection.cross)
+  ];
 
   @Output()
   Stream<CreateHook> get created => _streamCtrl.stream;
 
+  /// the state (active, inactive, dragging) of the toolbox
+  /// Controlled by the invoker bloc (geofence_list_component)
   @Input()
   ToolboxState state;
 
-  SketchBloc drawingBloc; //dawing shapes processor
+  /// the sketch toolbox dispatches events to the areas bloc
+  final areasBloc = AreaBloc(); //final shapes processor
+
+  SketchBloc drawingBloc;
 
   final List<String> groups;
 
   Area _makeArea(String text) {
     var area = Area();
     if (!text.startsWith("POINT")) {
-      area.json = GeoJson()..value = text;// text.replaceFirst("LineString", "Polygon");
+      area.json = GeoJson()
+        ..value = text; // text.replaceFirst("LineString", "Polygon");
     } else {
       final tokens = text.split(" ");
       area.point = Point()..center = LatLng();
@@ -72,61 +91,59 @@ class FenceToolboxComponent with Dragging implements OnDestroy {
     return area;
   }
 
+  OpenStreetMap _map;
+
   @Input()
   set map(OpenStreetMap value) {
-    drawingBloc?.map = value;
+    _map = value;
     _subscription = areasBloc.state.listen((AreaState s) {
       if (s is AreaCreatedState) {
-        areaText = s.shape.description;
+        areaText = (s.shape is CircleShape) ? "circle area" : "polygon area";
         hook.area = _makeArea(s.shape.description);
         s.shape.dispose();
-        drawingBloc.dispatch(EndOptionEvent());
       } else if (s is AreaDrawInProgress) {
         areaText = s.message;
       }
     });
   }
 
-  final drawOptions = <OptionsEvent>[
-    CircleOptionEvent(label: "Circle"),
-    PolygonOptionEvent(label: "Polygon")
-  ];
-
-  @ViewChild(ToolboxComponent)
-  ToolboxComponent sketchToolbox;
-
   FenceToolboxComponent(DataStore store)
       : groups = store.fleet.map((x) => x.name).toList() {
-    drawingBloc = SketchBloc(areasBloc);
-
     initDragging(container: "#map-editor");
-    makeDraggable("#draw", drawToolboxBloc);
   }
 
   @override
   void ngOnDestroy() {
-    drawingBloc.dispose();
+    drawingBloc?.dispose();
     areasBloc.dispose();
     _subscription?.cancel();
   }
 
-  void onMapSelector(bool visible) {
-    sketchToolbox.enabled = visible;
-    drawToolboxBloc
-        .dispatch(visible ? ShowToolEvent([320, 0]) : HideToolEvent());
+  void onSelectArea(bool enabled) {
+    selectingArea = enabled;
+    if (enabled) {
+      drawingBloc = SketchBloc(areasBloc);
+      drawingBloc.map = _map;
+      drawingBloc?.dispatch(CircleOptionEvent(label: ""));
+    } else {
+      drawingBloc?.dispatch(EndOptionEvent());
+      drawingBloc?.dispose();
+      drawingBloc = null;
+    }
+  }
+
+  void onToolChange(String tool) {
+    if (tool == "circle") {
+      drawingBloc?.dispatch(CircleOptionEvent(label: ""));
+    } else {
+      drawingBloc?.dispatch(PolygonOptionEvent(label: ""));
+    }
   }
 
   void onSelectedCommand(String cmd) {
     if (cmd is String) {
-      //search in the list of strings the Enum value of command
+      ///search in the list of strings the Enum value of command
       hook.command = Command.values.firstWhere((c) => c.name == cmd);
-    }
-  }
-
-  void onSelectedDetection(String detect) {
-    //search in the list of available strings
-    if (detect is String) {
-      hook.detection = Detection.values.firstWhere((c) => c.name == detect);
     }
   }
 
