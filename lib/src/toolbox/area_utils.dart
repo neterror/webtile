@@ -21,13 +21,17 @@ class AreaUtils {
   }
 
   ll.Circle circleFromPoint(dynamic point,
-      {@required double radius, String color}) {
+      {@required double radius, String color, bool stroke = true}) {
     //  Expected a value of type 'JSObject<circle>', but got one of type 'NativeJavaScriptObject'
     //the point may come from javascript, in which case its type is NativeJavaScriptObject
     //copy to new object to avoid error runtime exceptions
     var pos = ll.LatLng(point.lat, point.lng);
     var options = ll.CircleOptions()..radius = radius;
-    if (color is String) options.color = color;
+    options.stroke = stroke;
+    if (color is String) {
+      options.color = color;
+    }
+
     final marker = ll.Circle(pos, options);
     marker.addTo(_osm.map);
     return marker;

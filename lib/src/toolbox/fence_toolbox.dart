@@ -46,7 +46,7 @@ class _Detect {
     ])
 class FenceToolboxComponent with Dragging implements OnDestroy {
   final _streamCtrl = StreamController<CreateHook>();
-  final hook = Hook();
+  final Hook hook = Hook();
   final allCommands = Command.values.map((c) => c.name).toList();
   bool selectingArea = false;
 
@@ -149,6 +149,13 @@ class FenceToolboxComponent with Dragging implements OnDestroy {
 
   void onCreateChannel() {
     var create = CreateHook();
+    hook.detection.clear();
+    for (var option in detectOptions) {
+      if (option.selected) {
+        hook.detection.add(option.detection);
+      }
+    }
+
     create.hook = hook;
     _streamCtrl.sink.add(create);
   }

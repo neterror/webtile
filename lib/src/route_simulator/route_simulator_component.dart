@@ -170,9 +170,10 @@ class RouteSimulatorComponent implements OnInit, OnDestroy {
   void onPlayPath(VehiclePath path) async {
     var p = path.points.first;
     var a = AreaUtils(osm);
-    var marker = a.circleFromPoint(p, radius: 90, color: "black");
-    final sub = _timeSeq(100)
-        .listen((i) => marker.setRadius(((i % 10) * 5).toDouble()));
+    double zoom = osm.map.getZoom();
+    var marker = a.circleFromPoint(p, radius: 20, color: "black");
+    final sub = _timeSeq(50)
+        .listen((i) => marker.setRadius(((i * 2) % 20 + 20).toDouble()));
 
     marker.addTo(osm.map);
     await for (var i in _timeSeq(1500)) {
