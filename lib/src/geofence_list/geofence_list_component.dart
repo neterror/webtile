@@ -79,7 +79,6 @@ class GeofenceListComponent with Dragging implements AfterViewInit, OnDestroy {
   @override
   void ngAfterViewInit() {
     _sub = _protocol.received.listen(_onReceived);
-
     initDragging(container: "#map-editor");
     makeDraggable("#fence", fenceToolboxBloc);
   }
@@ -99,9 +98,14 @@ class GeofenceListComponent with Dragging implements AfterViewInit, OnDestroy {
         hooks = packet.hookList.items;
         break;
       case Packet_Data.status:
-        lastStatus.success = packet.status.success;
-        lastStatus.message = packet.status.message;
-        lastStatus.show = true;
+        if (packet.status.success) {
+          getHookList("$selectedGroup*");
+        } else {
+          lastStatus.success = packet.status.success;
+          lastStatus.message = packet.status.message;
+          lastStatus.show = true;
+        }
+
         break;
       default:
     }

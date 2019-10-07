@@ -217,7 +217,6 @@ class RouteSimulatorComponent implements OnInit, OnDestroy {
   }
 
   void _geofenceEvent(pb.GeofenceEvent e) {
-    print("event e: ${e}");
     var active = _hooks.firstWhere((x) => x.name == e.hook);
     _showArea(active.area);
   }
@@ -226,13 +225,12 @@ class RouteSimulatorComponent implements OnInit, OnDestroy {
     var path = _createPath(area);
     final options = PathOptions();
     options.opacity = 1.0;
-    options.stroke = false;
+    options.stroke = true;
     await for (var i in _timeSeq(100)) {
       options.opacity = 1 - (0.1 * i);
       path.setStyle(options);
       if (i >= 10) break;
     }
-    print("clearing the area");
     path.remove();
   }
 
@@ -240,6 +238,6 @@ class RouteSimulatorComponent implements OnInit, OnDestroy {
     final a = AreaUtils(osm);
     return (area.whichData() == pb.Area_Data.point)
         ? a.circleFromArea(area)
-        : a.polygon(area, color: "red", stroke: false);
+        : a.polygon(area, stroke: true);
   }
 }
