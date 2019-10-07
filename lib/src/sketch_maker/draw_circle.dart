@@ -1,3 +1,5 @@
+import 'dart:js';
+
 import 'package:dartleaf/dartleaf.dart' as m;
 import 'package:webtile38/src/toolbox/bloc/bloc.dart';
 import 'draw.dart';
@@ -23,17 +25,17 @@ class DrawCircle implements Draw {
   set active(bool draw) {
     if (draw) {
       _map.dragging.disable();
-      _map.on(
-          m.E.mousedown,
-          (e) =>
-              _circleMarker != null ? _drawCircleEnd(e) : _drawCircleStart(e));
-      _map.on(m.E.mousemove, _drawCircle);
+      _map.on(m.E.mousedown, allowInterop(_mouseDown));
+      _map.on(m.E.mousemove, allowInterop(_drawCircle));
     } else {
       _map.off(m.E.mousedown);
       _map.off(m.E.mousemove);
       _map.dragging.enable();
     }
   }
+
+  void _mouseDown(m.LeafletMouseEvent e) =>
+      _circleMarker != null ? _drawCircleEnd(e) : _drawCircleStart(e);
 
   void _drawCircleStart(m.LeafletMouseEvent e) {
     _centerCoord = e.latlng;

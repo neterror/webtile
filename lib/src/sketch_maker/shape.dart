@@ -1,3 +1,4 @@
+import 'package:js/js.dart';
 import 'package:dartleaf/dartleaf.dart';
 import 'package:webtile38/src/toolbox/bloc/bloc.dart';
 
@@ -33,29 +34,27 @@ class Shape {
   void dispose() {}
 
   void _attachEvents() {
-    _path.on(E.mouseover, (LeafletMouseEvent e) {
-      _hovering = true;
-      _path.setStyle(PathOptions(
-          fill: true,
-          fillColor: fillColor,
-          fillOpacity: 0.8,
-          color: lineColor));
-    });
+    _path.on(E.mouseover, allowInterop(_mouseOver));
+    _path.on(E.mouseout, allowInterop(_mouseOut));
+    _path.on(E.mousedown, allowInterop(_mouseDown));
+  }
 
-    _path.on(E.mouseout, (LeafletMouseEvent e) {
-      _hovering = false;
-      _path.setStyle(PathOptions(
-          fill: true,
-          fillColor: fillColor,
-          fillOpacity: 0.4,
-          color: lineColor));
-    });
+  void _mouseDown(LeafletMouseEvent e) {
+    if (_hovering) {
+      _areaBloc?.dispatch(AreaSelected());
+    }
+  }
 
-    _path.on(E.mousedown, (LeafletMouseEvent e) {
-      if (_hovering) {
-        _areaBloc?.dispatch(AreaSelected());
-      }
-    });
+  void _mouseOver(LeafletMouseEvent e) {
+    _hovering = true;
+    _path.setStyle(PathOptions(
+        fill: true, fillColor: fillColor, fillOpacity: 0.8, color: lineColor));
+  }
+
+  void _mouseOut(LeafletMouseEvent e) {
+    _hovering = false;
+    _path.setStyle(PathOptions(
+        fill: true, fillColor: fillColor, fillOpacity: 0.4, color: lineColor));
   }
 
   void _detachEvents() {

@@ -1,4 +1,5 @@
 import 'dart:html';
+import 'dart:js';
 import 'package:angular/angular.dart';
 import 'package:dartleaf/dartleaf.dart';
 
@@ -18,6 +19,8 @@ class OpenStreetMap implements OnInit, AfterViewInit {
   void ngAfterViewInit() {
     _show("map-placeholder");
   }
+
+  on(String type, Function fn) => (_map.on(type, allowInterop(fn)));
 
   @Input()
   Map<String, String> style;

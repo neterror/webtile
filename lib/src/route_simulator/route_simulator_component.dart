@@ -88,8 +88,8 @@ class RouteSimulatorComponent implements OnInit, OnDestroy {
   bool get readPathName => state is PathmakerPathNameState;
 
   void _attachEvents() {
-    osm.map.on(E.mousedown, _mouseDown);
-    osm.map.on(E.mousemove,
+    osm.on(E.mousedown, _mouseDown);
+    osm.on(E.mousemove,
         (e) => bloc.dispatch(PathmakerPosEvent(e.latlng.lat, e.latlng.lng)));
   }
 

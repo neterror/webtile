@@ -1,3 +1,4 @@
+import 'dart:js';
 import 'dart:html';
 import 'package:dartleaf/dartleaf.dart';
 import 'package:webtile38/src/toolbox/bloc/bloc.dart';
@@ -47,8 +48,8 @@ class DrawPolygon implements Draw {
 
   void _activate() {
     _map.dragging.disable();
-    _map.on(E.mousedown, _buttonDown);
-    _map.on(E.mousemove, _mouseMove);
+    _map.on(E.mousedown, allowInterop(_buttonDown));
+    _map.on(E.mousemove, allowInterop(_mouseMove));
 
     _polyline.setStyle(PathOptions(
         fill: true,
