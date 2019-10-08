@@ -45,7 +45,7 @@ class ProtobufProxy implements Tile38Proto {
   }
 
   void send(dynamic data) async {
-    bool connected = _socket.readyState == WebSocket.OPEN;
+    bool connected = (_socket is WebSocket) && (_socket.readyState == WebSocket.OPEN);
     if (!connected) {
       connected =  await connect();
     }

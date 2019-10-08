@@ -15,10 +15,15 @@ class OpenStreetMap implements OnInit, AfterViewInit {
   @override
   void ngOnInit() {}
 
+  @Input()
+  bool showAfterInit = true;
+
   @override
   void ngAfterViewInit() {
-    _show("map-placeholder");
+    if (showAfterInit) _show("map-placeholder");
   }
+
+  void show() => _show("map-placeholder");
 
   on(String type, Function fn) => (_map.on(type, allowInterop(fn)));
 
