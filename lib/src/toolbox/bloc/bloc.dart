@@ -7,3 +7,6 @@ export 'drawing_state.dart';
 export 'area_bloc.dart';
 export 'area_event.dart';
 export 'area_state.dart';
+export 'pathmaker_bloc.dart';
+export 'pathmaker_event.dart';
+export 'pathmaker_state.dart';

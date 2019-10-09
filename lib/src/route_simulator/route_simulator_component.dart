@@ -8,8 +8,8 @@ import 'package:angular_forms/angular_forms.dart';
 import 'package:webtile38/src/map_component/open_street_map.dart';
 import 'package:webtile38/src/providers/datastore.dart';
 import 'package:webtile38/src/providers/tile38_proto.dart';
+import 'package:webtile38/src/toolbox/bloc/bloc.dart';
 import 'vehicle_path.dart';
-import 'bloc/bloc.dart';
 import 'package:angular_bloc/angular_bloc.dart';
 import 'package:webtile38/src/gen/tile38.pb.dart' as pb;
 import 'package:webtile38/src/toolbox/area_utils.dart';
@@ -175,7 +175,7 @@ class RouteSimulatorComponent implements OnInit, OnDestroy {
         .listen((i) => marker.setRadius(((i * 2) % 20 + 20).toDouble()));
 
     marker.addTo(osm.map);
-    await for (var i in _timeSeq(1500)) {
+    await for (var i in _timeSeq(1000)) {
       if (i == path.points.length) {
         await sub.cancel();
         break;

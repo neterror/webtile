@@ -6,7 +6,7 @@ import 'package:webtile38/src/cli_console/tile38_cli_component.dart';
 import 'package:webtile38/src/cli_console/bloc/bloc.dart';
 import 'package:webtile38/src/map_editor/map_editor.dart';
 import 'package:webtile38/src/fleet_editor/fleet_editor_component.dart';
-import 'package:webtile38/src/route_simulator/bloc/pathmaker_bloc.dart';
+import 'package:webtile38/src/toolbox/bloc/bloc.dart';
 import 'package:webtile38/src/route_simulator/route_simulator_component.dart';
 import 'package:webtile38/src/providers/tile38_proto.dart';
 import 'package:webtile38/src/providers/datastore.dart';
