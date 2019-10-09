@@ -1,5 +1,5 @@
 <div class="relative">
-    <open-street-map #map [style]="{'height': '400px'}"> </open-street-map>
+    <open-street-map [showAfterInit]="initMap" #map [style]="{'height': '400px'}"> </open-street-map>
 
     <div *ngIf="reportingPos" id="position-label"> {{state}} </div>
 

@@ -62,6 +62,11 @@ class RouteSimulatorComponent implements OnInit, OnDestroy {
     _subscription = _protocol.received.listen(_onReceived);
   }
 
+  @Input()
+  bool initMap = true;
+
+  void showMap() => osm.show();
+
   @override
   void ngOnInit() {
     final request = pb.GetHooks()..pattern = "*";
