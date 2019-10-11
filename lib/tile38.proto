@@ -1,1 +1,93 @@
-/home/plamen/Development/proxytile/lib/tile38.proto
+syntax = "proto3";
+
+enum Detection {
+  enter = 0;
+  exit = 1;
+  inside = 2;
+  outside = 3;
+  cross = 4;
+}
+
+enum Command {
+  nearby = 0;
+  within = 1;
+  intersects = 2;
+}
+
+message GenericCommand { string command = 1; }
+message GenericResponse { string response = 1; }
+
+
+message Point {
+  LatLng center = 1;
+  double radius = 2;
+}
+
+message GeoJson { string value = 1; }
+
+message Area {
+  oneof data {
+    Point point = 1;
+    GeoJson json = 2;
+  }
+}
+
+message GeofenceEvent {
+  Detection detect = 1;
+  string command = 2;
+  string hook = 3;
+  string group = 4;
+  string vehicle = 5;
+  LatLng position = 6;
+}
+
+message Hook {
+  string name = 1;
+  string group = 2;
+  Command command = 3;
+  repeated Detection detection = 4;
+  Area area = 5;
+}
+
+message LatLng {
+  double lat = 1;
+  double lng = 2;
+}
+
+message CreateHook {
+  Hook hook = 1;
+}
+
+message SetObj {
+  string group = 1;
+  string object = 2;
+  Area area = 3;
+}
+
+message Status {
+  bool success = 1;
+  string message = 2;
+}
+
+
+message GetHooks { string pattern = 1; }
+message HookList { repeated Hook items = 2; }
+message DelHook {
+  string pattern = 1;
+}
+message Packet {
+  oneof data {
+    GenericCommand genericCmd = 1;
+    GenericResponse genericResponse = 2;
+
+    CreateHook createHook = 3;
+    GetHooks getHooks = 4;
+    HookList hookList = 5;
+    DelHook delHook = 6;
+
+    Status status = 7;
+    GeofenceEvent geofenceEvent = 8;
+
+    SetObj setObj = 9;
+  }
+}

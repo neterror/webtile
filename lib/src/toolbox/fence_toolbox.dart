@@ -55,7 +55,7 @@ class FenceToolboxComponent with Dragging implements OnDestroy {
   String areaText;
   final detectOptions = <_Detect>[
     _Detect(Detection.enter),
-    _Detect(Detection.leave),
+    _Detect(Detection.exit),
     _Detect(Detection.inside),
     _Detect(Detection.outside),
     _Detect(Detection.cross)
