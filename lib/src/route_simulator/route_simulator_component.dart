@@ -222,6 +222,7 @@ class RouteSimulatorComponent implements OnInit, OnDestroy {
   }
 
   void _geofenceEvent(pb.GeofenceEvent e) {
+    print("received geofence event: ${e}");
     var active = _hooks.firstWhere((x) => x.name == e.hook);
     _showArea(active.area);
   }
