@@ -3,7 +3,6 @@ import 'package:bloc/bloc.dart';
 import 'package:webtile38/src/map_component/open_street_map.dart';
 import './bloc.dart';
 import 'package:webtile38/src/sketch_maker/draw.dart';
-import 'package:webtile38/src/sketch_maker/draw_rectangle.dart';
 import 'package:webtile38/src/sketch_maker/draw_circle.dart';
 import 'package:webtile38/src/sketch_maker/draw_polygon.dart';
 
@@ -29,8 +28,6 @@ class SketchBloc extends Bloc<OptionsEvent, DrawingState> {
 
     if (event is PolygonOptionEvent) {
       _draw = DrawPolygon(map.map, _areaBloc, event.label);
-    } else if (event is RectangleOptionEvent) {
-      _draw = DrawRectangle(map.map, _areaBloc, event.label);
     } else if (event is CircleOptionEvent) {
       _draw = DrawCircle(map.map, _areaBloc, event.label);
     }

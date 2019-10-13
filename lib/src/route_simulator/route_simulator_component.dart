@@ -55,10 +55,11 @@ class RouteSimulatorComponent implements OnInit, OnDestroy {
   final List<VehiclePath> paths;
   final Tile38Proto _protocol;
   List<pb.Hook> _hooks;
+  final DataStore _dataStore;
 
   StreamSubscription _subscription;
-  RouteSimulatorComponent(DataStore store, this._protocol)
-      : paths = store.routeSim {
+  RouteSimulatorComponent(this._dataStore, this._protocol)
+      : paths = _dataStore.routeSim  {
     _subscription = _protocol.received.listen(_onReceived);
   }
 
@@ -127,6 +128,7 @@ class RouteSimulatorComponent implements OnInit, OnDestroy {
     _markers.forEach((x) => x.remove());
 
     _detachEvents();
+    _dataStore.save();
     bloc.dispatch(PathmakerInactiveEvent());
   }
 
@@ -172,22 +174,45 @@ class RouteSimulatorComponent implements OnInit, OnDestroy {
   Stream<int> _timeSeq(int milliseconds) =>
       Stream.periodic(Duration(milliseconds: milliseconds), (x) => x);
 
-  void onPlayPath(VehiclePath path) async {
+  void onPauseEvent(path) {
+    paths.elementAt(paths.indexOf(path)).running = false; 
+  }
+
+  void onLoopPath(VehiclePath path) {
+    if (paths.contains(path)) {
+      VehiclePath curPath = paths.elementAt(paths.indexOf(path));
+      if (curPath.running) {
+        return;
+      } else {
+        onPlayPath(curPath, true);
+      }
+    }
+  }
+
+  void onPlayPath(VehiclePath path, bool loop) async {
     var p = path.points.first;
     var a = AreaUtils(osm);
     var marker = a.circleFromPoint(p, radius: 20, color: "black");
     final sub = _timeSeq(50)
         .listen((i) => marker.setRadius(((i * 2) % 20 + 20).toDouble()));
-
+    path.running = true;
     marker.addTo(osm.map);
     await for (var i in _timeSeq(1000)) {
-      if (i == path.points.length) {
-        await sub.cancel();
-        break;
+      if (!path.running) {
+          break;
       }
-      var pos = LatLng(path.points[i].lat, path.points[i].lng);
+      if (i == path.points.length) {
+        
+        if (!loop) {
+          await sub.cancel();
+          path.running = false;
+          break;
+        }
+      }
+      var pos = LatLng(path.points[i % path.points.length].lat,
+                       path.points[i % path.points.length].lng);
       marker.setLatLng(pos);
-      _reportPosition(path, i);
+      _reportPosition(path, i % path.points.length);
     }
     marker.remove();
   }
