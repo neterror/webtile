@@ -181,11 +181,7 @@ class RouteSimulatorComponent implements OnInit, OnDestroy {
   void onLoopPath(VehiclePath path) {
     if (paths.contains(path)) {
       VehiclePath curPath = paths.elementAt(paths.indexOf(path));
-      if (curPath.running) {
-        return;
-      } else {
         onPlayPath(curPath, true);
-      }
     }
   }
 
@@ -218,17 +214,22 @@ class RouteSimulatorComponent implements OnInit, OnDestroy {
   }
 
   void _reportPosition(VehiclePath path, int pos) {
+    var field= pb.Field();
+    field.key = "IMEI";
+    field.value = path.name; 
     final cmd = pb.SetObj()
       ..group = path.group
       ..object = path.vehicleId
-      ..area = pb.Area();
+      ..area = pb.Area()
+      ..fields.add(field); 
     cmd.area.point = pb.Point();
+
     var c = pb.LatLng()
       ..lat = path.points[pos].lat
       ..lng = path.points[pos].lng;
     cmd.area.point.center = c;
     cmd.area.point.radius = 0;
-
+    
     final packet = pb.Packet()..setObj = cmd;
     _protocol.send(packet);
   }
